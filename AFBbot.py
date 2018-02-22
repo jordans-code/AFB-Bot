@@ -5,11 +5,11 @@ import time
 def reddit_login():
     if c.debuglogin:
         print ("Logging in...")
-    login = praw.Reddit(username = c.reddit_user,
-                    password = c.reddit_pass,
-                    client_id = c.reddit_api,
-                    client_secret = c.reddit_secret,
-                    user_agent = "Air Force Base Bot /r/AFBbot")
+    login = praw.Reddit(username=c.reddit_user,
+                    password=c.reddit_pass,
+                    client_id=c.reddit_api,
+                    client_secret=c.reddit_secret,
+                    user_agent="Air Force Base Bot /r/AFBbot")
     if c.debuglogin:
         print ("Logged in!")
     return login
