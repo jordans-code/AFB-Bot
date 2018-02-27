@@ -23,7 +23,7 @@ def create_table(base):
 
 
 def create_logtable():
-    c.execute(f'''CREATE TABLE IF NOT EXISTS log(unix REAL, datestamp TEXT, type TEXT, base TEXT, 
+    c.execute('''CREATE TABLE IF NOT EXISTS log(unix REAL, datestamp TEXT, type TEXT, base TEXT, 
     username TEXT, value REAL, commentid TEXT, message TEXT)''')
 
 
@@ -31,12 +31,6 @@ def data_entry(base, name, rating, commentid):
     unix = time.time()
     now = datetime.datetime.now()
     datestamp = f"{now.year}-{now.month}-{now.day}"
-    print (base)
-    print (unix)
-    print (datestamp)
-    print (name)
-    print (rating)
-    print (commentid)
     c.execute(f"INSERT INTO {base} VALUES(?, ?, ?, ?, ?)", (unix, datestamp,
                                                             name, rating, commentid),)
 
@@ -50,8 +44,8 @@ def change_entry(base, name, rating, commentid):
     unix = time.time()
     now = datetime.datetime.now()
     datestamp = f"{now.year}-{now.month}-{now.day}"
-    c.execute("UPDATE ? SET unix = ?, datestamp = ?, value = ?, commentid = ? WHERE username = ?", (base, unix, datestamp, rating, commentid, name),)
-    print("Number of rows updated: %d" % c.rowcount)
+    c.execute("UPDATE ? SET unix = ?, datestamp = ?, value = ?, commentid = ? WHERE username = ?",
+              (base, unix,datestamp, rating, commentid, name),)
     db.commit()
 
 
@@ -71,7 +65,7 @@ def query_rating(base):
 
 
 def query_commentid(commentid):  # check if we have already handled this comment
-    c.execute(f"SELECT * FROM log WHERE commentid = '{commentid}'")
+    c.execute("SELECT * FROM log WHERE commentid = ?", (commentid,))
     x = c.fetchall()
     if len(x) > 0:
         return True
