@@ -24,11 +24,12 @@ comments_checked = []
 
 
 def checkbases(comment):  # Checks all base instances and checks to see if someone is trying to rate one.
+    checktext = comment.body.lower().split()
     for base in bases.all_bases:
         for name in base.names:
-            if name.lower() in comment.body.lower():
+            if name in checktext:
                 if not bases.db.query_commentid(comment.id):  # check if we have already handled comment
-                    if "rate" in comment.body.lower() and checkvalidrating(comment.body.lower()):
+                    if "rate" in checktext and checkvalidrating(comment.body.lower()):
                         if c.debugsearch:
                             print("User appears to be rating base.")
                         rating_list = list(comment.body)
@@ -45,11 +46,12 @@ def checkbases(comment):  # Checks all base instances and checks to see if someo
 
 
 def checkbasesthread(thread):  # Checks all base instances and checks to see if someone is trying to rate one.
+    checktext = thread.selftext.lower().split()
     for base in bases.all_bases:
         for name in base.names:
-            if name.lower() in thread.selftext.lower():
+            if name in checktext:
                 if not bases.db.query_commentid(thread.id):  # check if we have already handled comment
-                    if "rate" in thread.selftext.lower() and checkvalidrating(thread.body.lower()):
+                    if "rate" in checktext and checkvalidrating(thread.body.lower()):
                         if c.debugsearch:
                             print("User appears to be rating base.")
                         rating_list = list(thread.body)
