@@ -18,7 +18,8 @@ class Base(object):
 
     def getrating(self):
         overallrating = db.query_rating(self.names[0])
-        return overallrating
+        roundedrating = "%.2f" % overallrating
+        return roundedrating
 
     def changerating(self, author, rating, commentid):
         db.change_entry(self.names[0], author, rating, commentid)
