@@ -56,3 +56,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 constants.py
+ratings.db
