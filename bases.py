@@ -8,11 +8,11 @@ class Base(object):
         self.displayname = displayname
         self.names = names
 
-    def addrating(self, author, rating, commentid):
+    def addrating(self, author, rating, commentid, threadid):
         if db.query_existing(self.names[0], author):
             return False
         else:
-            db.data_entry(self.names[0], author, rating, commentid)
+            db.data_entry(self.names[0], author, rating, commentid, threadid)
             print(f"Added rating {rating} to {self.names[0]} by {author}")
             return True
 
@@ -21,8 +21,8 @@ class Base(object):
         roundedrating = "%.2f" % overallrating
         return roundedrating
 
-    def changerating(self, author, rating, commentid):
-        db.change_entry(self.names[0], author, rating, commentid)
+    def changerating(self, author, rating, commentid, threadid):
+        db.change_entry(self.names[0], author, rating, commentid, threadid)
 
     def getmajcom(self):
         if self.majcom is not None:
@@ -198,6 +198,9 @@ sheikisa = Base("Bahrain", "AFCENT", "Sheik Isa Air Base", ["sheik"])
 shindand = Base("Afghanistan.", "AFCENT", "Shindand Air Base", ["shindand"])
 thumrait = Base("Oman", "AFCENT", "RAFO Thumrait", ["thumrait"])
 
+# Army
+
+zama = Base("Sagamihara, Japan.", None, "Camp Zama", ["zama"])
 
 # Have abstained from adding ANG bases due to a lack of mentions and to save time.
 
@@ -211,7 +214,7 @@ all_bases = [altus, arnold, barksdale, beale, buckley, cannon, cavalier, columbu
              ghedi, incirlik, izmir, kleinebrogel, lajes, moron, geilenkirchen, papa, alconbury, croughton, fairford,
              feltwell, flyingdales, lakenheath, menwith, mildenhall, molesworth, welford, ramstein, spangdahlem,
              stavanger, volkel, eielson, kadena, kunsan, misawa, osan, yokota, aldhafra, aludeid, alialsalem, bagram,
-             kabul, kandahar, sheikisa, shindand, shindand, thumrait]
+             kabul, kandahar, sheikisa, shindand, shindand, thumrait, zama]
 
 
 def maketables():

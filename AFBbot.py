@@ -16,7 +16,7 @@ def reddit_login():
 
     if c.debuglogin:
         print("Logged in!")
-    bases.db.log('Login', None, None, None, None, 'Successfully Logged In')
+    bases.db.log('Login', None, None, None, None, None, 'Successfully Logged In')
     return login
 
 
@@ -34,13 +34,22 @@ def checkbases(comment):  # Checks all base instances and checks to see if someo
                             print("User appears to be rating base.")
                         rating_list = list(comment.body)
                         rating = getratingnumber(rating_list)
-                        bases.db.log('rate', base.names[0], name, rating, comment.id, None)
+                        bases.db.log('rate', base.names[0], name, rating, comment.id, comment.submission.id, None)
                         rated_reply(comment, base, rating)
+                        print("Done!")
                     else:
-                        bases.db.log('reply', base.names[0], name, None, comment.id, None)
-                        reply(comment, base)
+                        for trigger in c.triggers:
+                            if trigger in checktext:
+                                bases.db.log('reply', base.names[0], name, None, comment.id, comment.submission.id, None)
+                                reply(comment, base)
+                            else:
+                                print(f"{comment.id} mentioned {base.names[0]} but did not include a trigger!")
+                                pass
+                        else:
+                            print("Already a reply in the thread, ignoring...")
+                            pass
                 else:
-                    pass
+                    pass  # Already checked this comment.
             else:
                 continue
 
@@ -51,16 +60,21 @@ def checkbasesthread(thread):  # Checks all base instances and checks to see if 
         for name in base.names:
             if name in checktext:
                 if not bases.db.query_commentid(thread.id):  # check if we have already handled comment
-                    if "rate" in checktext and checkvalidrating(thread.body.lower()):
+                    if "rate" in checktext and checkvalidrating(thread.selftext.lower()):
                         if c.debugsearch:
                             print("User appears to be rating base.")
-                        rating_list = list(thread.body)
+                        rating_list = list(thread.selftext.lower())
                         rating = getratingnumber(rating_list)
-                        bases.db.log('rate', base.names[0], name, rating, thread.id, None)
+                        bases.db.log('rate', base.names[0], name, rating, thread.id, thread.id, None)
                         rated_reply(thread, base, rating)
                     else:
-                        bases.db.log('reply', base.names[0], name, None, thread.id, None)
-                        reply(thread, base)
+                        for trigger in c.triggers:
+                            if trigger in checktext:
+                                bases.db.log('reply', base.names[0], name, None, thread.id, thread.id, None)
+                                reply(thread, base)
+                            else:
+                                print(f"{thread.id} mentioned {base.names[0]} but did not include a trigger!")
+                                pass
                 else:
                     pass
             else:
@@ -70,7 +84,7 @@ def checkbasesthread(thread):  # Checks all base instances and checks to see if 
 def checkvalidrating(comment):
     numbers = [int(x) for x in comment if x.isdigit()]
     if c.debugsearch:
-        print ("Checking if the rating is valid, I found these numbers: " + str(numbers) + "Length "
+        print("Checking if the rating is valid, I found these numbers: " + str(numbers) + "Length "
                + str(len(numbers)))
     if len(numbers) > 2:
         if c.debugsearch:
@@ -117,11 +131,11 @@ Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.
 
 def rated_reply(comment, base, rating):
     print ("Adding rating to " + str(comment.id))
-    if base.addrating(str(comment.author), rating, comment.id):  # Checks if they have already added a rating to this base
+    if base.addrating(str(comment.author), rating, comment.id, comment.submission.id):  # Checks if they have already added a rating to this base
         comment.reply(f'''Your rating has been added to {base.displayname}.\n\n
 Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n''' + c.bot_signature)
     else:
-        base.changerating(str(comment.author), rating, comment.id)
+        base.changerating(str(comment.author), rating, comment.id, comment.submission.id)
         comment.reply(f'''Your rating of {base.displayname} has been changed to {str(rating)}.  
 Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n''' + c.bot_signature)
 
@@ -129,7 +143,7 @@ Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.
 def bot_main(login):
     try:
         session = login
-        print ("Checking comments...")
+        print("Checking comments...")
         for sub in c.reddit_subs:
             for comment in session.subreddit(sub).comments(limit=20):  # Need to check for locked thread, throws except
                 if comment.id not in comments_checked and comment.author != c.reddit_user:
@@ -138,7 +152,7 @@ def bot_main(login):
                 else:
                     if c.debugsearch:
                         print("I do not see a match")
-            print ("Checking threads...")
+            print("Checking threads...")
             for thread in session.subreddit(sub).new(limit=5):
                 if thread.id not in comments_checked:
                     comments_checked.append(thread.id)
@@ -149,7 +163,7 @@ def bot_main(login):
         print("Invalid credentials while logging in!")
         time.sleep(15)
     except Exception as e:
-        bases.db.log('Error', None, None, None, None, str(e))
+        bases.db.log('Error', None, None, None, None, None, str(e))
         print(e)
     else:
         print("Completed loop successfully.")
