@@ -24,7 +24,11 @@ comments_checked = []
 
 
 def checkbases(comment):  # Checks all base instances and checks to see if someone is trying to rate one.
-    checktext = comment.body.lower().split()
+    filterchars = '!@#$%^&*()-+<>=,.?:'
+    filteredtext = comment.body.lower()
+    for char in filterchars:
+        filteredtext = filteredtext.replace(char, "")
+    checktext = filteredtext.split()
     for base in bases.all_bases:
         for name in base.names:
             if name in checktext:
@@ -39,15 +43,11 @@ def checkbases(comment):  # Checks all base instances and checks to see if someo
                         print("Done!")
                     else:
                         for trigger in c.triggers:
-                            if trigger in checktext:
+                            if trigger.lower() in checktext:
                                 bases.db.log('reply', base.names[0], name, None, comment.id, comment.submission.id, None)
                                 reply(comment, base)
                             else:
-                                print(f"{comment.id} mentioned {base.names[0]} but did not include a trigger!")
                                 pass
-                        else:
-                            print("Already a reply in the thread, ignoring...")
-                            pass
                 else:
                     pass  # Already checked this comment.
             else:
@@ -55,7 +55,11 @@ def checkbases(comment):  # Checks all base instances and checks to see if someo
 
 
 def checkbasesthread(thread):  # Checks all base instances and checks to see if someone is trying to rate one.
-    checktext = thread.selftext.lower().split()
+    filterchars = '!@#$%^&*()-+<>=,.?:'
+    filteredtext = thread.selftext.lower()
+    for char in filterchars:
+        filteredtext = filteredtext.replace(char, "")
+    checktext = filteredtext.split()
     for base in bases.all_bases:
         for name in base.names:
             if name in checktext:
@@ -69,11 +73,10 @@ def checkbasesthread(thread):  # Checks all base instances and checks to see if 
                         rated_reply(thread, base, rating)
                     else:
                         for trigger in c.triggers:
-                            if trigger in checktext:
+                            if trigger.lower() in checktext:
                                 bases.db.log('reply', base.names[0], name, None, thread.id, thread.id, None)
                                 reply(thread, base)
                             else:
-                                print(f"{thread.id} mentioned {base.names[0]} but did not include a trigger!")
                                 pass
                 else:
                     pass
@@ -99,14 +102,14 @@ def checkvalidrating(comment):
             return True
         else:
             if c.debugsearch:
-                print ("Found 2 numbers but they are not 10, returning False")
+                print("Found 2 numbers but they are not 10, returning False")
             return False
     elif len(numbers) == 1:
         if numbers[0] in range(1, 10):
             return True
         else:
             if c.debugsearch:
-                print ("Found a number but it is not in range of 1 - 10, returning false.")
+                print("Found a number but it is not in range of 1 - 10, returning false.")
             return False
 
 
