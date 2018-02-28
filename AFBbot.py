@@ -20,27 +20,22 @@ def reddit_login():
     return login
 
 
-comments_checked = []
+comments_checked = []  # temporary, this is for if the log fails we can still stop checking a post.
 
 
 def checkbases(comment):  # Checks all base instances and checks to see if someone is trying to rate one.
-    filterchars = '!@#$%^&*()-+<>=,.?:'
-    filteredtext = comment.body.lower()
-    for char in filterchars:
-        filteredtext = filteredtext.replace(char, "")
-    checktext = filteredtext.split()
+    checktext = filtertext(comment.body.lower())
+    stringtext = ''.join(checktext)
     for base in bases.all_bases:
         for name in base.names:
             if name in checktext:
                 if not bases.db.query_commentid(comment.id):  # check if we have already handled comment
-                    if "rate" in checktext and checkvalidrating(comment.body.lower()):
+                    if "rate" in checktext and checkvalidrating(stringtext):
                         if c.debugsearch:
                             print("User appears to be rating base.")
-                        rating_list = list(comment.body)
-                        rating = getratingnumber(rating_list)
+                        rating = getratingnumber(ratingfilter(comment.body.lower()))
                         bases.db.log('rate', base.names[0], name, rating, comment.id, comment.submission.id, None)
-                        rated_reply(comment, base, rating)
-                        print("Done!")
+                        rated_reply(comment, base, rating, "comment")
                     else:
                         for trigger in c.triggers:
                             if trigger.lower() in checktext:
@@ -55,22 +50,19 @@ def checkbases(comment):  # Checks all base instances and checks to see if someo
 
 
 def checkbasesthread(thread):  # Checks all base instances and checks to see if someone is trying to rate one.
-    filterchars = '!@#$%^&*()-+<>=,.?:'
-    filteredtext = thread.selftext.lower()
-    for char in filterchars:
-        filteredtext = filteredtext.replace(char, "")
-    checktext = filteredtext.split()
+    checktext = filtertext(thread.selftext.lower())
+    stringtext = ''.join(checktext)
+
     for base in bases.all_bases:
         for name in base.names:
             if name in checktext:
                 if not bases.db.query_commentid(thread.id):  # check if we have already handled comment
-                    if "rate" in checktext and checkvalidrating(thread.selftext.lower()):
+                    if "rate" in checktext and checkvalidrating(stringtext):
                         if c.debugsearch:
                             print("User appears to be rating base.")
-                        rating_list = list(thread.selftext.lower())
-                        rating = getratingnumber(rating_list)
+                        rating = getratingnumber(ratingfilter(thread.selftext.lower()))
                         bases.db.log('rate', base.names[0], name, rating, thread.id, thread.id, None)
-                        rated_reply(thread, base, rating)
+                        rated_reply(thread, base, rating, "thread")
                     else:
                         for trigger in c.triggers:
                             if trigger.lower() in checktext:
@@ -84,46 +76,87 @@ def checkbasesthread(thread):  # Checks all base instances and checks to see if 
                 continue
 
 
+def ratingfilter(text):
+    noquotetext = filterqtext(text)
+    filterchars = '!@#$%^&*()+<>=,?:'
+    filteredtext = ''.join(noquotetext)
+    filteredtext = filteredtext.replace("/", " ")
+    print(str(filteredtext))
+    for char in filterchars:
+        filteredtext = filteredtext.replace(char, "")
+    checktext = filteredtext.split()
+    if c.debugsearch:
+        print(str(checktext))
+    return checktext
+
+
+def filtertext(text):
+    noquotetext = filterqtext(text)
+    filterchars = '!@#$%^&*()/-+<>=,.?:'
+    filteredtext = ''.join(noquotetext)
+    for char in filterchars:
+        filteredtext = filteredtext.replace(char, "")
+    checktext = filteredtext.split()
+    if c.debugsearch:
+        print(str(checktext))
+    return checktext
+
+
+def filterqtext(text):  # prevents replying to quoted text and for things like "langley?" from not being queried.
+    checkquote = list(text)
+    for char in checkquote[0]:
+        if char == '>':
+            if c.debugsearch:
+                print("Quote found")
+            if "\n" in checkquote:
+                for z in range(len(checkquote)):
+                    for char2 in checkquote[z]:
+                        if char2 == '\n':
+                            if c.debugsearch:
+                                print("Line break found")
+                            del checkquote[0:(z + 2)]
+                            if ">" in checkquote:
+                                if c.debugsearch:
+                                    print("Multi quote comment, will not reply.")
+                                return ""
+                            else:
+                                return checkquote
+            else:
+                if c.debugsearch:
+                    print("No line break found, not replying.")
+                return ""
+    return checkquote
+
+
 def checkvalidrating(comment):
+    print (str(comment))
     numbers = [int(x) for x in comment if x.isdigit()]
+    print (str(numbers))
     if c.debugsearch:
         print("Checking if the rating is valid, I found these numbers: " + str(numbers) + "Length "
                + str(len(numbers)))
-    if len(numbers) > 2:
-        if c.debugsearch:
-            print ("More than 2 numbers, returning with a reply instead of a rating")
-        return False
-    elif len(numbers) < 1:
+    if len(numbers) < 1:
         if c.debugsearch:
             print("No numbers, returning with a reply instead of a rating")
         return False
-    elif len(numbers) == 2:
-        if int(str(numbers[0]) + str(numbers[1])) == 10:
-            return True
-        else:
-            if c.debugsearch:
-                print("Found 2 numbers but they are not 10, returning False")
-            return False
-    elif len(numbers) == 1:
-        if numbers[0] in range(1, 10):
-            return True
-        else:
-            if c.debugsearch:
-                print("Found a number but it is not in range of 1 - 10, returning false.")
-            return False
+    else:
+        return True
 
 
 def getratingnumber(text):
-    numbers = [int(x) for x in text if x.isdigit()]
-    if len(numbers) == 2:
-        if int(str(numbers[0]) + str(numbers[1])) == 10:
-            return 10
-    elif len(numbers) == 1:
-        if numbers[0] in range(1, 10):
-            return numbers[0]
+    print(str(text))
+    numbers = [float(x) for x in text if not x.isalpha()]
+    print(str(numbers))
+    if numbers[0] > 10:
+        return 10.00
+    elif 1 <= numbers[0] <= 10:
+        rounded = "%.2f" % numbers[0]
+        return rounded
+    elif numbers[0] <= 1:
+        return 1.00
     else:
-        print ("Invalid rating number " + str(numbers))
-        return 5
+        print ("Something weird happened with the getrating number, " + str(numbers[0]))
+        return 10.00
 
 
 def reply(comment, base):
@@ -132,15 +165,26 @@ def reply(comment, base):
 Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n""" + c.bot_signature)
 
 
-def rated_reply(comment, base, rating):
-    print ("Adding rating to " + str(comment.id))
-    if base.addrating(str(comment.author), rating, comment.id, comment.submission.id):  # Checks if they have already added a rating to this base
-        comment.reply(f'''Your rating has been added to {base.displayname}.\n\n
-Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n''' + c.bot_signature)
+def rated_reply(comment, base, rating, self):
+    if self == "comment":
+        print ("Adding rating to " + str(comment.id))
+        if base.addrating(str(comment.author), rating, comment.id, comment.submission.id):  # Checks if they have already added a rating to this base
+            comment.reply(f'''Your rating has been added to {base.displayname}.\n\n
+    Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n''' + c.bot_signature)
+        else:
+            base.changerating(str(comment.author), rating, comment.id, comment.submission.id)
+            comment.reply(f'''Your rating of {base.displayname} has been changed to {str(rating)}.  
+    Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n''' + c.bot_signature)
     else:
-        base.changerating(str(comment.author), rating, comment.id, comment.submission.id)
-        comment.reply(f'''Your rating of {base.displayname} has been changed to {str(rating)}.  
-Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n''' + c.bot_signature)
+        print("Adding rating to " + str(comment.id))
+        if base.addrating(str(comment.author), rating, comment.id,
+                          comment.id):  # Checks if they have already added a rating to this base
+            comment.reply(f'''Your rating has been added to {base.displayname}.\n\n
+        Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n''' + c.bot_signature)
+        else:
+            base.changerating(str(comment.author), rating, comment.id, comment.id)
+            comment.reply(f'''Your rating of {base.displayname} has been changed to {str(rating)}.  
+        Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n''' + c.bot_signature)
 
 
 def bot_main(login):
