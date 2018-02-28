@@ -189,7 +189,7 @@ yokota = Base("Tokyo, Japan.", "PACAF", "Yokota Air Base", ["yokota"])
 
 # AFCENT
 aldhafra = Base("United Arab Emirates.", "AFCENT", "Al Dhafra Air Base", ["dhafra"])
-aludeid = Base("Qatar.", "AFCENT", "Al Udeid Air Base", ["udeid", "deid"])
+aludeid = Base("Qatar.", "AFCENT", "Al Udeid Air Base", ["udeid", "deid", "auab"])
 alialsalem = Base("Kuwait.", "AFCENT", "Ali Al Salem Air Base", ["alsalem", "salem"])
 bagram = Base("Afghanistan.", "AFCENT", "Bagram Airfield", ["bagram"])
 kabul = Base("Afghanistan.", "AFCENT", "Kabul International Airport", ["kabul"])
