@@ -28,7 +28,7 @@ def checkbases(comment):  # Checks all base instances and checks to see if someo
     checktext = filtertext(linebreaktext).split()
     stringtext = ''.join(checktext)
     if c.debugsearch:
-        print (str(checktext))
+        print(str(checktext))
     for base in bases.all_bases:
         for name in base.names:
             if name in checktext:
@@ -43,7 +43,8 @@ def checkbases(comment):  # Checks all base instances and checks to see if someo
                     else:
                         for trigger in c.triggers:
                             if trigger.lower() in checktext:
-                                bases.db.log('reply', base.names[0], name, None, comment.id, comment.submission.id, None)
+                                bases.db.log('reply', base.names[0], name, None, comment.id,
+                                             comment.submission.id, None)
                                 reply(comment, base)
                             else:
                                 pass
@@ -82,6 +83,11 @@ def checkbasesthread(thread):  # Checks all base instances and checks to see if 
 
 def ratingfilter(text):
     noquotetext = filterqtext(text)
+    for char in noquotetext:
+        if char == "\n":
+            noquotetext[char] = ""
+    if c.debugsearch:
+        print("start of filtered text: " + str(noquotetext))
     filterchars = '!@#$%^&*()+<>=,?:;'
     filteredtext = ''.join(noquotetext)
     filteredtext = filteredtext.replace("/", " ")
@@ -110,7 +116,7 @@ def filtertext(text):
         print("Symbols have been removed: " + str(filteredtext))
     checktext = ''.join(filteredtext)
     if c.debugsearch:
-        print ("Final check to text: " + checktext)
+        print("Final check to text: " + checktext)
     return checktext
 
 
@@ -127,7 +133,7 @@ def filterqtext(text):  # prevents replying to quoted text and for things like "
                     if char2 == '\n':
                         if c.debugsearch:
                             print("Line break found")
-                            print ("Quote: " + str(checkquote))
+                            print("Quote: " + str(checkquote))
                         del checkquote[0:(z + 2)]
                         if ">" in checkquote:
                             if c.debugsearch:
@@ -147,13 +153,13 @@ def checkvalidrating(comment):
     del splitlist[0]
     joinedlist = ''.join(splitlist)
     if c.debugsearch:
-        print (str(joinedlist))
+        print(str(joinedlist))
     numbers = [int(x) for x in comment if x.isdigit()]
     if c.debugsearch:
-        print (str(numbers))
+        print(str(numbers))
     if c.debugsearch:
         print("Checking if the rating is valid, I found these numbers: " + str(numbers) + "Length "
-               + str(len(numbers)))
+              + str(len(numbers)))
     if len(numbers) < 1:
         if c.debugsearch:
             print("No numbers, returning with a reply instead of a rating")
@@ -170,9 +176,6 @@ def getratingnumber(text):
             for z in range(0, i):
                 delete.append(z)
             continue
-    if c.debugsearch:
-        print (str(delete))
-        print (str(text))
     for i in sorted(delete, reverse=True):
         del text[i]
 
@@ -183,9 +186,6 @@ def getratingnumber(text):
         if realword.isalpha():
             delete.append(i)
             continue
-    if c.debugsearch:
-        print (str(delete))
-        print (str(text))
     for i in sorted(delete, reverse=True):
         del text[i]
 
@@ -202,10 +202,12 @@ def getratingnumber(text):
                     appenededperiod = True
             else:
                 number.append(str(charlist[i]))
-        print (str(number))
+        if c.debugsearch:
+            print(str(number))
         truenumber = ''.join(str(i) for i in number)
         finalnumber.append(truenumber)
-    print(str(finalnumber))
+    if c.debugsearch:
+        print(str(finalnumber))
 
     numbers = [float(x) for x in finalnumber if not x.isalpha()]
     if c.debugsearch:
@@ -219,41 +221,46 @@ def getratingnumber(text):
     elif numbers[0] <= 1:
         return 1.00
     else:
-        print ("Something weird happened with the getrating number, " + str(numbers[0]))
+        print("Something weird happened with the getrating number, " + str(numbers[0]))
         return 10.00
 
 
 def reply(comment, base):
-    print ("Adding reply to " + str(comment.id))
+    print("Adding reply to " + str(comment.id))
     if not c.debugnoreply:
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
-Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n""" + c.bot_signature)
+Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n"""
+                      + c.bot_signature)
 
 
 def rated_reply(comment, base, rating, self):
     if self == "comment":
-        print ("Adding rating to " + str(comment.id))
-        if base.addrating(str(comment.author), rating, comment.id, comment.submission.id):  # Checks if they have already added a rating to this base
+        print("Adding rating to " + str(comment.id))  # Checks if they have already added a rating to this base
+        if base.addrating(str(comment.author), rating, comment.id, comment.submission.id):
             if not c.debugnoreply:
                 comment.reply(f'''Your rating has been added to {base.displayname}.\n\n
-Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n''' + c.bot_signature)
+Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n'''
+                              + c.bot_signature)
         else:
             base.changerating(str(comment.author), rating, comment.id, comment.submission.id)
             if not c.debugnoreply:
                 comment.reply(f'''Your rating of {base.displayname} has been changed to {str(rating)}.  
-Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n''' + c.bot_signature)
+Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n'''
+                              + c.bot_signature)
     else:
         print("Adding rating to " + str(comment.id))
         if base.addrating(str(comment.author), rating, comment.id,
                           comment.id):
-            if not c.debugnoreply:# Checks if they have already added a rating to this base
+            if not c.debugnoreply:  # Checks if they have already added a rating to this base
                 comment.reply(f'''Your rating has been added to {base.displayname}.\n\n
-Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n''' + c.bot_signature)
+Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n'''
+                              + c.bot_signature)
         else:
             base.changerating(str(comment.author), rating, comment.id, comment.id)
             if not c.debugnoreply:
                 comment.reply(f'''Your rating of {base.displayname} has been changed to {str(rating)}.  
-Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n''' + c.bot_signature)
+Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n'''
+                              + c.bot_signature)
 
 
 def bot_main(login):
@@ -261,19 +268,22 @@ def bot_main(login):
         session = login
         print("Checking comments...")
         for sub in c.reddit_subs:
-            print ("Checking in sub " + str(sub))
+            print("Checking in sub " + str(sub))
             for comment in session.subreddit(sub).comments(limit=20):  # Need to check for locked thread, throws except
-                if comment.id not in comments_checked and comment.author != c.reddit_user:
-                    print("Comment " + str(comment.id) + " is not in " + str(comments_checked))
+                if comment.id not in comments_checked and comment.author != c.reddit_user\
+                        and len(comment.body.lower()) > 0:
+                    if c.debugsearch:
+                        print("Comment " + str(comment.id) + " is not in " + str(comments_checked))
                     comments_checked.append(comment.id)
                     checkbases(comment)
                 else:
                     continue
             print("Checking threads...")
             for thread in session.subreddit(sub).new(limit=5):
-                if thread.id not in comments_checked:
+                if thread.id not in comments_checked and len(thread.selftext.lower()) > 0:
                     comments_checked.append(thread.id)
                     checkbasesthread(thread)
+
     except prawcore.exceptions.OAuthException as e:
         bases.db.log('Login Error', None, None, None, None, None, str(e))
         print("Invalid credentials while logging in!")
@@ -294,5 +304,3 @@ if __name__ == "__main__":
         bases.maketables()
     while True:  # Main loop
         bot_main(reddit_login())
-
-
