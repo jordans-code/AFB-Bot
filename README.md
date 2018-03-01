@@ -1,4 +1,4 @@
-# AFB-Bot
+# AFB-Bot  - A Reddit Bot
 
 **Features:**
 * When summoned for information the bot will currently provide the full base name, the MAJCOM, the city/state/country, and the overall base rating.
