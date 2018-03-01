@@ -6,7 +6,7 @@ reddit_secret = ""
 
 debuglogin = False
 debugsearch = False
-
+debugnoreply = False
 
 createdb = False  # Creates tables for all bases.
 
