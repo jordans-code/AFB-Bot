@@ -261,8 +261,10 @@ def bot_main(login):
         session = login
         print("Checking comments...")
         for sub in c.reddit_subs:
+            print ("Checking in sub " + str(sub))
             for comment in session.subreddit(sub).comments(limit=20):  # Need to check for locked thread, throws except
                 if comment.id not in comments_checked and comment.author != c.reddit_user:
+                    print("Comment " + str(comment.id) + " is not in " + str(comments_checked))
                     comments_checked.append(comment.id)
                     checkbases(comment)
                 else:
@@ -273,7 +275,7 @@ def bot_main(login):
                     comments_checked.append(thread.id)
                     checkbasesthread(thread)
     except prawcore.exceptions.OAuthException as e:
-        bases.db.log('Login Error', None, None, None, None, str(e))
+        bases.db.log('Login Error', None, None, None, None, None, str(e))
         print("Invalid credentials while logging in!")
         time.sleep(15)
     except Exception as e:
