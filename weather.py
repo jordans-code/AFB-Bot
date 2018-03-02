@@ -1,5 +1,5 @@
 import pywapi
-
+import database
 
 def getweather(location):
     try:
@@ -12,11 +12,15 @@ def getweather(location):
         humidity = str(weather['current_conditions']['humidity'])
         location = str(weather['location']['name'])
         if condition == "":
-            final = f"It is {feels_like}° with humidity at {humidity}% in {location}."
+            final = f"It is {feels_like}° with humidity at {humidity}% in {location}.\n\n"
         else:
-            final = f"It is {condition} and {feels_like}° with humidity at {humidity}% in {location}."
+            final = f"It is {condition} and {feels_like}° with humidity at {humidity}% in {location}.\n\n"
         return final
 
     except Exception as e:
         print(location + " has an invalid location for weather!")
+        database.log(f"weather", {location}, None, None, None, None, "Weather error, most likely invalid location.")
+        return ""
+
+
 
