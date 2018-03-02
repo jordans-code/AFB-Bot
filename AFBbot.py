@@ -3,7 +3,7 @@ import prawcore
 import constants as c
 import time
 import bases
-
+import weather
 
 def reddit_login():
     if c.debuglogin:
@@ -231,6 +231,7 @@ def reply(comment, base):
     print("Adding reply to " + str(comment.id))
     if not c.debugnoreply:
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
+{weather.getweather(base.location)}\n\n
 Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n"""
                       + c.bot_signature)
 
