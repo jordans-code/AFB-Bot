@@ -1,5 +1,4 @@
 import pywapi
-import bases
 
 
 def getweather(location):
@@ -9,8 +8,7 @@ def getweather(location):
             locationid = key
         weather = pywapi.get_weather_from_weather_com(str(locationid), units='imperial')
         condition = str(weather['current_conditions']['text']).lower()
-        temperature = str(weather['current_conditions']['temperature'])
-        feels_like = str(weather['current_conditions']['feels_like'])
+        feels_like = str(weather['current_conditions']['feels_like'])  # Could change to exact but this is more fun for that minot wind chill
         humidity = str(weather['current_conditions']['humidity'])
         location = str(weather['location']['name'])
         if condition == "":
