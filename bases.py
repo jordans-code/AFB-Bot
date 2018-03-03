@@ -194,7 +194,7 @@ alialsalem = Base("Kuwait.", "AFCENT", "Ali Al Salem Air Base", ["alsalem", "sal
 bagram = Base("Bagram, Afghanistan.", "AFCENT", "Bagram Airfield", ["bagram"])
 kabul = Base("Afghanistan.", "AFCENT", "Kabul International Airport", ["kabul"])
 kandahar = Base("Afghanistan.", "AFCENT", "Kandahar Airfield", ["kandahar"])
-sheikisa = Base("Bahrain", "AFCENT", "Sheik Isa Air Base", ["sheik"])
+sheikisa = Base("Bahrain", "AFCENT", "Sheik Isa Air Base", ["sheik", "isa"])
 shindand = Base("Afghanistan.", "AFCENT", "Shindand Air Base", ["shindand"])
 thumrait = Base("Thumrait, Oman.", "AFCENT", "RAFO Thumrait", ["thumrait"])
 
