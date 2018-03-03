@@ -271,9 +271,11 @@ def bot_main(login):
     try:
         comments_checking = [None, None, None, None, None, None, None]
         session = login
-        print("Checking comments...")
+        if c.debugsearch:
+            print("Checking comments...")
         for sub in c.reddit_subs:
-            print("Checking in sub " + str(sub))
+            if c.debugsearch:
+                print("Checking in sub " + str(sub))
             for comment in session.subreddit(sub).comments(limit=20):  # Need to check for locked thread, throws except
                 if comment.id not in comments_checked and comment.author != c.reddit_user\
                         and len(comment.body.lower()) > 0:
@@ -286,7 +288,8 @@ def bot_main(login):
                     checkbases(comment)
                 else:
                     continue
-            print("Checking threads...")
+            if c.debugsearch:
+                print("Checking threads...")
             for thread in session.subreddit(sub).new(limit=5):
                 if thread.id not in comments_checked and len(thread.selftext.lower()) > 0:
                     comments_checking[1] = thread.author
@@ -306,15 +309,19 @@ def bot_main(login):
                      str(comments_checking[3]), str(comments_checking[4]), str(e))
         print(e)
     else:
-        print("Completed loop successfully.")
+        if c.debugsearch:
+            print("Completed loop successfully.")
 
     finally:
-        print("Sleeping...")
+        if c.debugsearch:
+            print("Sleeping...")
         time.sleep(30)
 
 
 if __name__ == "__main__":
+    print("Running...")
     if c.createdb:
         bases.maketables()
+
     while True:  # Main loop
         bot_main(reddit_login())
