@@ -21,7 +21,7 @@
 
 - Add additional bases as they are suggested. I did not include many National Guard / Reserve bases due to a lack of mentions, however if you think a base should be added please let me know and it can be easily done. Undisclosed locations will obviously not be added.
 
-- Open to any suggestions. If there are any python gods out there (/u/HadManySons) who have the time to look over my git and see something that I could do better your feedback is always appreciated.
+- Open to any suggestions. If there are any python gods out there who have the time to look over my git and see something that I could do better your feedback is always appreciated.
 
 **Notes:**
 
