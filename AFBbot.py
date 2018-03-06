@@ -147,6 +147,10 @@ def filterqtext(text):  # prevents replying to quoted text and for things like "
                 if c.debugsearch:
                     print("No line break found, not replying.")
                 return ""
+    elif ">" in checkquote:
+        if c.debugsearch:
+            print("Quote within the text, will noy reply.")
+        return ""
     return checkquote
 
 
@@ -302,6 +306,10 @@ def bot_main(login):
         bases.db.log('Login Error', None, None, None, None, None, str(e))
         print("Invalid credentials while logging in!")
         time.sleep(15)
+
+    except ConnectionError as e:
+        print (e)
+        time.sleep(60)
 
     except Exception as e:
         print (f"Logging {comments_checking[0]} {comments_checking[1]} {comments_checking[2]} {comments_checking[3]} {comments_checking[4]} {e}")
