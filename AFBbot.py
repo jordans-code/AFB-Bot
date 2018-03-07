@@ -5,6 +5,7 @@ import time
 import bases
 import weather
 
+
 def reddit_login():
     if c.debuglogin:
         print("Logging in...")
