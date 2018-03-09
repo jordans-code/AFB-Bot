@@ -1,3 +1,5 @@
+"""Bot to check Reddit comments and threads for USAF base ratings."""
+
 import praw
 import prawcore
 import constants as c
@@ -7,6 +9,7 @@ import weather
 
 
 def reddit_login():
+    """Creates instance of Reddit login."""
     if c.debuglogin:
         print("Logging in...")
     login = praw.Reddit(username=c.reddit_user,
@@ -17,15 +20,15 @@ def reddit_login():
 
     if c.debuglogin:
         print("Logged in!")
-    #  bases.db.log('Login', None, None, None, None, None, 'Successfully Logged In')
     return login
 
 
-comments_checked = []  # temporary, this is a fail safe for if the log fails and stops us from rechecking posts.
+comments_checked = []  # This is a fail safe for if the log fails to refrain from rechecking posts.
 comment_checking = [None, None, None, None, None, None, None]
 
 
-def checkbases(comment):  # Checks all base instances and checks to see if someone is trying to rate one.
+def checkbases(comment):
+    """Checks all base instances and a comment for a rating."""
     linebreaktext = list(comment.body.lower())
     checktext = filtertext(linebreaktext).split()
     stringtext = ''.join(checktext)
@@ -34,7 +37,7 @@ def checkbases(comment):  # Checks all base instances and checks to see if someo
     for base in bases.all_bases:
         for name in base.names:
             if name in checktext:
-                if not bases.db.query_commentid(comment.id):  # check if we have already handled comment
+                if not bases.db.query_commentid(comment.id):  # Check if we have already handled comment
                     if "rate" in checktext and checkvalidrating(stringtext):
                         if c.debugsearch:
                             print("User appears to be rating base.")
@@ -55,7 +58,8 @@ def checkbases(comment):  # Checks all base instances and checks to see if someo
                 continue
 
 
-def checkbasesthread(thread):  # Checks all base instances and checks to see if someone is trying to rate one.
+def checkbasesthread(thread):
+    """Checks all base instances and a thread for a rating."""
     linebreaktext = list(thread.selftext.lower())
     checktext = filtertext(linebreaktext).split()
     stringtext = ''.join(checktext)
@@ -63,7 +67,7 @@ def checkbasesthread(thread):  # Checks all base instances and checks to see if 
     for base in bases.all_bases:
         for name in base.names:
             if name in checktext:
-                if not bases.db.query_commentid(thread.id):  # check if we have already handled comment
+                if not bases.db.query_commentid(thread.id):  # Check if we have already handled comment
                     comments_checking[0] = name
                     if "rate" in checktext and checkvalidrating(stringtext):
                         if c.debugsearch:
@@ -85,6 +89,7 @@ def checkbasesthread(thread):  # Checks all base instances and checks to see if 
 
 
 def ratingfilter(text):
+    """Filters characters from the rating text string."""
     noquotetext = filterqtext(text)
     for char in noquotetext:
         if char == "\n":
@@ -105,6 +110,7 @@ def ratingfilter(text):
 
 
 def filtertext(text):
+    """Filters characters from the comment or thread text string."""
     noquotetext = filterqtext(text)
     if c.debugsearch:
         print(noquotetext)
@@ -123,7 +129,8 @@ def filtertext(text):
     return checktext
 
 
-def filterqtext(text):  # prevents replying to quoted text and for things like "langley?" from not being queried.
+def filterqtext(text):
+    """Prevents replying to quoted text and keeps punctuated text checked"""
     checkquote = text
     if c.debugsearch:
         print("I am checking" + (str(text)) + "for a quote mark, I see " + str(checkquote[0][0]))
@@ -156,6 +163,7 @@ def filterqtext(text):  # prevents replying to quoted text and for things like "
 
 
 def checkvalidrating(comment):
+    """Validates rating if debugsearch is enabled."""
     splitlist = comment.split("rate")
     del splitlist[0]
     joinedlist = ''.join(splitlist)
@@ -176,6 +184,11 @@ def checkvalidrating(comment):
 
 
 def getratingnumber(text):
+    """Determines the rating of a base.
+
+    Detects the usage of 'rate' in a string,
+    determines the base and rating, and returns a rating.
+    """
     delete = []  # deletes everything up to and including the indexes "rate"
     for i in range(len(text)):
         word = text[i]
@@ -233,6 +246,7 @@ def getratingnumber(text):
 
 
 def reply(comment, base):
+    """Replies to a comment with the base rating."""
     print("Adding reply to " + str(comment.id))
     if not c.debugnoreply:
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
@@ -242,6 +256,7 @@ Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.
 
 
 def rated_reply(comment, base, rating, self):
+    """Acknowledges a base rating and replies with the updated rating"""
     if self == "comment":
         print("Adding rating to " + str(comment.id))  # Checks if they have already added a rating to this base
         if base.addrating(str(comment.author), rating, comment.id, comment.submission.id):
@@ -272,6 +287,7 @@ Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.
 
 
 def bot_main(login):
+    """Uses Reddit instance to check comments and threads."""
     global comments_checking
     try:
         comments_checking = [None, None, None, None, None, None, None]
