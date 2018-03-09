@@ -129,11 +129,11 @@ wrightpatterson = Base("Dayton, Ohio. United States.", "AFMC",
 
 # DOD Joint Bases
 bolling = Base("Washington, DC. United States.", None,
-               "JB Anacostia-Bolling", ["bolling", "anacostia", "anacostia-bolling"])
+               "JB Anacostia-Bolling", ["bolling", "anacostia", "anacostia-bolling", "jbab"])
 andrews = Base("Camp Springs, Maryland. United States.", None, "JB Andrews", ["andrews"])
 charleston = Base("Charleston, South Carolina. United States.", "AMC", "JB Charleston", ["charleston"])
 elmendorf = Base("Anchorage, Alaska. United States.", "PACAF",
-                 "JB Elmendorf-Richardson", ["elmendorf", "elmendorf-richardson"])
+                 "JB Elmendorf-Richardson", ["elmendorf", "elmendorf-richardson", "jber"])
 langley = Base("Hampton, Virginia. United States.", "ACC", "JB Langley-Eustis", ["langley", "eustis", "langley-eustis"])
 mcchord = Base("Tacoma, Washington. United States.", "AMC",
                "JB Lewis-McChord", ["mcchord", "lewis-mcchord"])
@@ -188,7 +188,7 @@ yokota = Base("Tokyo, Japan.", "PACAF", "Yokota Air Base", ["yokota"])
 
 
 # AFCENT
-aldhafra = Base("United Arab Emirates.", "AFCENT", "Al Dhafra Air Base", ["dhafra"])
+aldhafra = Base("United Arab Emirates.", "AFCENT", "Al Dhafra Air Base", ["dhafra", "adab"])
 aludeid = Base("Doha, Qatar.", "AFCENT", "Al Udeid Air Base", ["udeid", "deid", "auab"])
 alialsalem = Base("Kuwait.", "AFCENT", "Ali Al Salem Air Base", ["alsalem", "salem"])
 bagram = Base("Bagram, Afghanistan.", "AFCENT", "Bagram Airfield", ["bagram"])
