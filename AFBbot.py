@@ -21,63 +21,74 @@ comments_checked = []  # temporary, this is a fail safe for if the log fails and
 comment_checking = [None, None, None, None, None, None, None]
 
 
-def checkbases(comment):  # Checks all base instances and checks to see if someone is trying to rate one.
+def checkbases(comment):  # Checks comment for the word "rate" and base name, or the bot name and base name.
     linebreaktext = list(comment.body.lower())
     checktext = filtertext(linebreaktext).split()
     stringtext = ''.join(checktext)
-    if c.debugsearch:
-        print(str(checktext))
-    for base in bases.all_bases:
-        for name in base.names:
-            if name in checktext:
-                if not bases.db.query_commentid(comment.id):  # check if we have already handled comment
-                    if "rate" in checktext and checkvalidrating(stringtext):
-                        if c.debugsearch:
-                            print("User appears to be rating base.")
-                        rating = getratingnumber(ratingfilter(list(comment.body.lower())))
-                        if not c.debugnoreply:
-                            rated_reply(comment, base, rating, "comment")
-                    else:
-                        for trigger in c.triggers:
-                            if trigger.lower() in checktext:
+    if bases.db.query_commentid(comment.id):  # check if we have already handled comment
+        if c.debugsearch:
+            print("I have already handled this comment. " + str(comment.id))
+        pass
+    elif "rate" in checktext and checkvalidrating(stringtext):
+        for base in bases.all_bases:
+            for name in base.names:
+                if name in checktext:
+                    if c.debugsearch:
+                        print("User appears to be rating base.")
+                    rating = getratingnumber(ratingfilter(list(comment.body.lower())))
+                    if not c.debugnoreply:
+                        rated_reply(comment, base, rating, "comment")
+                    return True  # Prevents multiple base triggers creating multiple comments.
+    else:
+        for trigger in c.triggers:
+            if trigger.lower() in checktext:
+                if "stats" in checktext:
+                    print("Replying with stats.")  # To do
+                    return True
+                else:
+                    for base in bases.all_bases:
+                        for name in base.names:
+                            if name in checktext:
                                 bases.db.log('reply', base.names[0], name, None, comment.id,
                                              comment.submission.id, None)
                                 reply(comment, base)
-                            else:
-                                pass
-                else:
-                    pass  # Already checked this comment.
-            else:
-                continue
+                                return True  # Prevents multiple triggers creating multiple comments.
 
 
-def checkbasesthread(thread):  # Checks all base instances and checks to see if someone is trying to rate one.
+def checkbasesthread(thread):  # Checks submissions instead of comments.
     linebreaktext = list(thread.selftext.lower())
     checktext = filtertext(linebreaktext).split()
     stringtext = ''.join(checktext)
     global comments_checking
-    for base in bases.all_bases:
-        for name in base.names:
-            if name in checktext:
-                if not bases.db.query_commentid(thread.id):  # check if we have already handled comment
+    if bases.db.query_commentid(thread.id):
+        if c.debugsearch:
+            print("I have already handled this comment. " + str(thread.id))
+        pass
+
+    elif "rate" in checktext and checkvalidrating(stringtext):
+        for base in bases.all_bases:
+            for name in base.names:
+                if name in checktext:
                     comments_checking[0] = name
-                    if "rate" in checktext and checkvalidrating(stringtext):
-                        if c.debugsearch:
-                            print("User appears to be rating base.")
-                        rating = getratingnumber(ratingfilter(list(thread.selftext.lower())))
-                        comments_checking[2] = rating
-                        rated_reply(thread, base, rating, "thread")
-                    else:
-                        for trigger in c.triggers:
-                            if trigger.lower() in checktext:
+                    if c.debugsearch:
+                        print("User appears to be rating base.")
+                    rating = getratingnumber(ratingfilter(list(thread.selftext.lower())))
+                    comments_checking[2] = rating
+                    rated_reply(thread, base, rating, "thread")
+                    return True  # Prevents multiple base triggers creating multiple comments.
+    else:
+        for trigger in c.triggers:
+            if trigger.lower() in checktext:
+                if "stats" in checktext:  # To do
+                    print("Replying with stats.")
+                    return True
+                else:
+                    for base in bases.all_bases:
+                        for name in base.names:
+                            if name in checktext:
                                 bases.db.log('reply', base.names[0], name, None, thread.id, thread.id, None)
                                 reply(thread, base)
-                            else:
-                                pass
-                else:
-                    pass
-            else:
-                continue
+                                return True  # Prevents multiple triggers creating multiple comments.
 
 
 def ratingfilter(text):
