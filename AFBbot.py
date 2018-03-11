@@ -14,10 +14,6 @@ def reddit_login():
                         client_id=c.reddit_api,
                         client_secret=c.reddit_secret,
                         user_agent="Air Force Base Bot /r/AFBbot")
-
-    if c.debuglogin:
-        print("Logged in!")
-    #  bases.db.log('Login', None, None, None, None, None, 'Successfully Logged In')
     return login
 
 
@@ -200,8 +196,8 @@ def getratingnumber(text):
 
     for char in text:
         number = []
-        appenededperiod = False  # Weird way of doing this but works, prevents something like "9.5." from happening.
-        charlist = list(char)  # Also handles weird things like 52.643096.4,.,53//432
+        appenededperiod = False  # Handles decimals and extra periods, places the first one it finds in the number.
+        charlist = list(char)
         for i in range(len(charlist)):
             if charlist[i] == ".":
                 if not appenededperiod:
@@ -303,20 +299,23 @@ def bot_main(login):
                     comments_checked.append(thread.id)
                     checkbasesthread(thread)
 
+    except prawcore.exceptions.ResponseException as e:
+        print("Response error, server probably busy. Sleeping and retrying. " + str(e))
+        time.sleep(60)
+
     except prawcore.exceptions.OAuthException as e:
         bases.db.log('Login Error', None, None, None, None, None, str(e))
         print("Invalid credentials while logging in!")
-        time.sleep(15)
+        time.sleep(60)
 
     except ConnectionError as e:
-        print (e)
+        print("Connection error, sleeping and retrying. " + str(e))
         time.sleep(60)
 
     except Exception as e:
-        print (f"Logging {comments_checking[0]} {comments_checking[1]} {comments_checking[2]} {comments_checking[3]} {comments_checking[4]} {e}")
+        print(f"Logging {comments_checking[0]} {comments_checking[1]} {comments_checking[2]} {comments_checking[3]} {comments_checking[4]} {e}")
         bases.db.log('Error', str(comments_checking[0]), str(comments_checking[1]), comments_checking[2],
                      str(comments_checking[3]), str(comments_checking[4]), str(e))
-        print(e)
     else:
         if c.debugsearch:
             print("Completed loop successfully.")
