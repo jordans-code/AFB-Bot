@@ -58,10 +58,9 @@ class Base(object):
         else:# should not get here
             return "an unknown MAJCOM"
 
-
 altus = Base("Altus, Oklahoma. United States.", "AETC", "Altus Air Force Base", ["altus"])
 arnold = Base("Tullahoma, Tennessee. United States.", "AFMC", "Arnold Air Force Base", ["arnold"])
-barksdale = Base("Bossier City, Louisiana. United States.", "AFGSC", "Barksdale Air Force Base", ["barksdale"])
+barksdale = Base("Louisiana. United States.", "AFGSC", "Barksdale Air Force Base", ["barksdale"])
 beale = Base("Marysville, California. United States.", "ACC", "Beale Air Force Base", ["beale"])
 buckley = Base("Aurora, Colorado. United States.", "AFSPC", "Buckley Air Force Base", ["buckley"])
 cannon = Base("Clovis, New Mexico. United States.", "AFSOC", "Cannon Air Force Base", ["cannon"])
@@ -141,7 +140,7 @@ mcguire = Base("Trenton, New Jersey. United States.", None,
                 "JB McGuire-Dix-Lakehurst", ["mcguire", "mcguire-dix-lakehurst"])
 hickam = Base("Honolulu, Hawaii. United States.", "PACAF", "JB Pearl Harbor-Hickam", ["hickam"])
 lackland = Base("San Antonio, Texas. United States.", "AETC", "JB San Antonio", ["lackland", "jbsa", "randolph"])
-andersen = Base("Guam.", None, "Joint Region Marianas (Andersen AFB)", ["andersen", "marianas"])
+andersen = Base("Yigo, Guam.", None, "Joint Region Marianas (Andersen AFB)", ["andersen", "marianas"])
 
 
 
@@ -150,13 +149,13 @@ andersen = Base("Guam.", None, "Joint Region Marianas (Andersen AFB)", ["anderse
 
 # Europe / Africa
 thule = Base("Thule, Greenland.", "AFSPC", "Thule Air Base", ["thule"])
-ankara = Base("Turkey.", "USAFE-AFAFRICA", "Ankara Support Facility", ["ankara"])
+ankara = Base("Ankara, Turkey.", "USAFE-AFAFRICA", "Ankara Support Facility", ["ankara"])
 aviano = Base("Italy.", "USAFE-AFAFRICA", "Aviano Air Base", ["aviano"])
 buchel = Base("Germany.", "USAFE-AFAFRICA", "Büchel Air Base", ["buchel", "büchel"])
 chievres = Base("Belgium.", "USAFE-AFAFRICA", "Chièvres Air Base", ["chievres", "chièvres"])
 ghedi = Base("Italy.", "USAFE-AFAFRICA", "Ghedi Air Base", ["ghedi"])
-incirlik = Base("Turkey.", "USAFE-AFAFRICA", "Incirlik Air Base", ["incirlik"])
-izmir = Base("Turkey.", "USAFE-AFAFRICA", "Izmir Air Station", ["izmir"])
+incirlik = Base("Adana, Turkey.", "USAFE-AFAFRICA", "Incirlik Air Base", ["incirlik"])
+izmir = Base("Izmir, Turkey.", "USAFE-AFAFRICA", "Izmir Air Station", ["izmir"])
 kleinebrogel = Base("Belgium.", "USAFE-AFAFRICA", "Kleine Brogel Air Base", ["kleine", "brogel"])
 lajes = Base("Lajes Acores, Portugal.", "USAFE-AFAFRICA", "Lajes Field", ["lajes"])
 moron = Base("Spain.", "USAFE-AFAFRICA", "Morón Air Base", ["morón", "moron"])
@@ -196,7 +195,7 @@ kabul = Base("Afghanistan.", "AFCENT", "Kabul International Airport", ["kabul"])
 kandahar = Base("Afghanistan.", "AFCENT", "Kandahar Airfield", ["kandahar"])
 sheikisa = Base("Bahrain", "AFCENT", "Sheik Isa Air Base", ["sheik", "isa"])
 shindand = Base("Afghanistan.", "AFCENT", "Shindand Air Base", ["shindand"])
-thumrait = Base("Thumrait, Oman.", "AFCENT", "RAFO Thumrait", ["thumrait"])
+thumrait = Base("Salalah, Dhofar, Oman.", "AFCENT", "RAFO Thumrait", ["thumrait"])  # Incorrect location intentional for weather
 
 # Army
 

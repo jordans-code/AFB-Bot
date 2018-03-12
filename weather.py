@@ -9,8 +9,9 @@ def getweather(location):
             locationid = key
         weather = pywapi.get_weather_from_weather_com(str(locationid), units='imperial')
         condition = str(weather['current_conditions']['text']).lower()
-        feels_like = str(weather['current_conditions']['feels_like'])  # Could change to exact but this is more fun for that minot wind chill
+        feels_like = str(weather['current_conditions']['feels_like'])
         temperature = str(weather['current_conditions']['temperature'])
+        print(str(temperature))
         wind = str(weather['current_conditions']['wind']['speed'])
         humidity = str(weather['current_conditions']['humidity'])
         location = str(weather['location']['name'])
@@ -27,4 +28,19 @@ def getweather(location):
         return ""
 
 
+def getallweather(location):
+    try:
+        locationid = pywapi.get_location_ids(location)
+        for key in locationid:
+            locationid = key
+        weather = pywapi.get_weather_from_weather_com(str(locationid), units='imperial')
+        final = weather['current_conditions']['temperature']
+        if final == '':
+            return 50  # For handling exceptions if the site returns null
+        else:
+            return final
 
+    except Exception as e:
+        print(location + " Error trying to get all weather location for stats.")
+        database.log(f"weather", str({location}), None, None, None, None, "Weather error, most likely invalid location.")
+        return 50  # For handling exceptions if the site returns null

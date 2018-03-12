@@ -86,6 +86,7 @@ def query_threadid(threadid):
 
 
 def count_ratings(base):
+    """Returns the total number of ratings for a base."""
     c.execute(f"select count(*) from {base}")
     totalratings = str(c.fetchone())
     newratings = int(totalratings.translate({ord(i): None for i in '(),'}))
@@ -93,6 +94,7 @@ def count_ratings(base):
 
 
 def query_existing(base, name):
+    """Check for an existing rating by the comment/thread author for the base."""
     c.execute(f"SELECT rowid FROM {base} WHERE username = '{name}'")
     existing = c.fetchall()
     if len(existing) == 0:
