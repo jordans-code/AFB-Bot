@@ -17,9 +17,6 @@ def reddit_login():
                         client_id=c.reddit_api,
                         client_secret=c.reddit_secret,
                         user_agent="Air Force Base Bot /r/AFBbot")
-
-    if c.debuglogin:
-        print("Logged in!")
     return login
 
 
@@ -27,35 +24,40 @@ comments_checked = []  # This is a fail safe for if the log fails to refrain fro
 comment_checking = [None, None, None, None, None, None, None]
 
 
+
 def checkbases(comment):
-    """Checks all base instances and a comment for a rating."""
+  """Checks all base instances and a comment for a rating."""
     linebreaktext = list(comment.body.lower())
     checktext = filtertext(linebreaktext).split()
     stringtext = ''.join(checktext)
-    if c.debugsearch:
-        print(str(checktext))
-    for base in bases.all_bases:
-        for name in base.names:
-            if name in checktext:
-                if not bases.db.query_commentid(comment.id):  # Check if we have already handled comment
-                    if "rate" in checktext and checkvalidrating(stringtext):
-                        if c.debugsearch:
-                            print("User appears to be rating base.")
-                        rating = getratingnumber(ratingfilter(list(comment.body.lower())))
-                        if not c.debugnoreply:
-                            rated_reply(comment, base, rating, "comment")
-                    else:
-                        for trigger in c.triggers:
-                            if trigger.lower() in checktext:
+    if bases.db.query_commentid(comment.id):  # Check log to see if comment is handled, will only happen on restarts.
+        if c.debugsearch:
+            print("I have already handled this comment. " + str(comment.id))
+        pass
+    elif "rate" in checktext and checkvalidrating(stringtext):
+        for base in bases.all_bases:
+            for name in base.names:
+                if name in checktext:
+                    if c.debugsearch:
+                        print("User appears to be rating base.")
+                    rating = getratingnumber(ratingfilter(list(comment.body.lower())))
+                    if not c.debugnoreply:
+                        rated_reply(comment, base, rating, "comment")
+                    return True  # Prevents multiple base triggers creating multiple comments.
+    else:
+        for trigger in c.triggers:
+            if trigger.lower() in checktext:
+                if "stats" in checktext:
+                    print("Replying with stats.")  # To do
+                    return True
+                else:
+                    for base in bases.all_bases:
+                        for name in base.names:
+                            if name in checktext:
                                 bases.db.log('reply', base.names[0], name, None, comment.id,
                                              comment.submission.id, None)
                                 reply(comment, base)
-                            else:
-                                pass
-                else:
-                    pass  # Already checked this comment.
-            else:
-                continue
+                                return True  # Prevents multiple triggers creating multiple comments.
 
 
 def checkbasesthread(thread):
@@ -64,28 +66,35 @@ def checkbasesthread(thread):
     checktext = filtertext(linebreaktext).split()
     stringtext = ''.join(checktext)
     global comments_checking
-    for base in bases.all_bases:
-        for name in base.names:
-            if name in checktext:
-                if not bases.db.query_commentid(thread.id):  # Check if we have already handled comment
+    if bases.db.query_commentid(thread.id):  # Check log to see if comment is handled, will only happen on restarts.
+        if c.debugsearch:
+            print("I have already handled this comment. " + str(thread.id))
+        pass
+
+    elif "rate" in checktext and checkvalidrating(stringtext):
+        for base in bases.all_bases:
+            for name in base.names:
+                if name in checktext:
                     comments_checking[0] = name
-                    if "rate" in checktext and checkvalidrating(stringtext):
-                        if c.debugsearch:
-                            print("User appears to be rating base.")
-                        rating = getratingnumber(ratingfilter(list(thread.selftext.lower())))
-                        comments_checking[2] = rating
-                        rated_reply(thread, base, rating, "thread")
-                    else:
-                        for trigger in c.triggers:
-                            if trigger.lower() in checktext:
+                    if c.debugsearch:
+                        print("User appears to be rating base.")
+                    rating = getratingnumber(ratingfilter(list(thread.selftext.lower())))
+                    comments_checking[2] = rating
+                    rated_reply(thread, base, rating, "thread")
+                    return True  # Prevents multiple base triggers creating multiple comments.
+    else:
+        for trigger in c.triggers:
+            if trigger.lower() in checktext:
+                if "stats" in checktext:  # To do
+                    print("Replying with stats.")
+                    return True
+                else:
+                    for base in bases.all_bases:
+                        for name in base.names:
+                            if name in checktext:
                                 bases.db.log('reply', base.names[0], name, None, thread.id, thread.id, None)
                                 reply(thread, base)
-                            else:
-                                pass
-                else:
-                    pass
-            else:
-                continue
+                                return True  # Prevents multiple triggers creating multiple comments.
 
 
 def ratingfilter(text):
@@ -213,8 +222,8 @@ def getratingnumber(text):
 
     for char in text:
         number = []
-        appenededperiod = False  # Weird way of doing this but works, prevents something like "9.5." from happening.
-        charlist = list(char)  # Also handles weird things like 52.643096.4,.,53//432
+        appenededperiod = False  # Handles decimals and extra periods, places the first one it finds in the number.
+        charlist = list(char)
         for i in range(len(charlist)):
             if charlist[i] == ".":
                 if not appenededperiod:
@@ -319,20 +328,23 @@ def bot_main(login):
                     comments_checked.append(thread.id)
                     checkbasesthread(thread)
 
+    except prawcore.exceptions.ResponseException as e:
+        print("Response error, server probably busy. Sleeping and retrying. " + str(e))
+        time.sleep(60)
+
     except prawcore.exceptions.OAuthException as e:
         bases.db.log('Login Error', None, None, None, None, None, str(e))
         print("Invalid credentials while logging in!")
-        time.sleep(15)
+        time.sleep(60)
 
     except ConnectionError as e:
-        print (e)
+        print("Connection error, sleeping and retrying. " + str(e))
         time.sleep(60)
 
     except Exception as e:
-        print (f"Logging {comments_checking[0]} {comments_checking[1]} {comments_checking[2]} {comments_checking[3]} {comments_checking[4]} {e}")
+        print(f"Logging {comments_checking[0]} {comments_checking[1]} {comments_checking[2]} {comments_checking[3]} {comments_checking[4]} {e}")
         bases.db.log('Error', str(comments_checking[0]), str(comments_checking[1]), comments_checking[2],
                      str(comments_checking[3]), str(comments_checking[4]), str(e))
-        print(e)
     else:
         if c.debugsearch:
             print("Completed loop successfully.")
