@@ -4,7 +4,7 @@ reddit_subs = ["AFBbot"]
 reddit_api = ""
 reddit_secret = ""
 
-catcherrors = False
+catcherrors = True
 debugweather = False
 debuglogin = False
 debugsearch = False
