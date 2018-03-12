@@ -4,12 +4,12 @@ reddit_subs = ["AFBbot"]
 reddit_api = ""
 reddit_secret = ""
 
+catcherrors = False
+debugweather = False
 debuglogin = False
 debugsearch = False
 debugnoreply = False
-
 createdb = False  # Creates tables for all bases.
-
 
 triggers = ['afbbot', 'uafbbot']
 bot_signature = '''---\n\n
