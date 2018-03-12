@@ -3,8 +3,7 @@ import prawcore
 import constants as c
 import time
 import bases
-import weather
-
+import stats
 
 def reddit_login():
     if c.debuglogin:
@@ -43,7 +42,7 @@ def checkbases(comment):  # Checks comment for the word "rate" and base name, or
         for trigger in c.triggers:
             if trigger.lower() in checktext:
                 if "stats" in checktext:
-                    print("Replying with stats.")  # To do
+                    statsreply(comment, comment.submission.id)
                     return True
                 else:
                     for base in bases.all_bases:
@@ -79,8 +78,8 @@ def checkbasesthread(thread):  # Checks submissions instead of comments.
     else:
         for trigger in c.triggers:
             if trigger.lower() in checktext:
-                if "stats" in checktext:  # To do
-                    print("Replying with stats.")
+                if "stats" in checktext:
+                    statsreply(thread.id, thread.id)
                     return True
                 else:
                     for base in bases.all_bases:
@@ -243,10 +242,15 @@ def reply(comment, base):
     print("Adding reply to " + str(comment.id))
     if not c.debugnoreply:
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
-{weather.getweather(base.location)}
+{stats.weather.getweather(base.location)}
 Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n"""
                       + c.bot_signature)
 
+def statsreply(comment, threadid):
+    print("Replying with stats to " + str(comment.id))
+    if not c.debugnoreply:
+        comment.reply(stats.Stats.getreply(stats.thestats) + c.bot_signature)
+        bases.db.log("Stats", None, str(comment.author), None, str(comment.id), str(threadid), None)
 
 def rated_reply(comment, base, rating, self):
     if self == "comment":
@@ -280,7 +284,63 @@ Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.
 
 def bot_main(login):
     global comments_checking
-    try:
+    if c.catcherrors:
+        try:
+            comments_checking = [None, None, None, None, None, None, None]
+            session = login
+            if c.debugsearch:
+                print("Checking comments...")
+            for sub in c.reddit_subs:
+                if c.debugsearch:
+                    print("Checking in sub " + str(sub))
+                for comment in session.subreddit(sub).comments(limit=20):  # Need to check for locked thread, throws except
+                    if comment.id not in comments_checked and comment.author != c.reddit_user\
+                            and len(comment.body.lower()) > 0:
+                        comments_checking[1] = comment.author
+                        comments_checking[3] = comment.id
+                        comments_checking[4] = comment.submission.id
+                        if c.debugsearch:
+                            print("Comment " + str(comment.id) + " is not in " + str(comments_checked))
+                        comments_checked.append(comment.id)
+                        checkbases(comment)
+                    else:
+                        continue
+                if c.debugsearch:
+                    print("Checking threads...")
+                for thread in session.subreddit(sub).new(limit=5):
+                    if thread.id not in comments_checked and len(thread.selftext.lower()) > 0:
+                        comments_checking[1] = thread.author
+                        comments_checking[3] = thread.id
+                        comments_checking[4] = thread.id
+                        comments_checked.append(thread.id)
+                        checkbasesthread(thread)
+
+        except prawcore.exceptions.ResponseException as e:
+            print("Response error, server probably busy. Sleeping and retrying. " + str(e))
+            time.sleep(60)
+
+        except prawcore.exceptions.OAuthException as e:
+            bases.db.log('Login Error', None, None, None, None, None, str(e))
+            print("Invalid credentials while logging in!")
+            time.sleep(60)
+
+        except ConnectionError as e:
+            print("Connection error, sleeping and retrying. " + str(e))
+            time.sleep(60)
+
+        except Exception as e:
+            print(f"Logging {comments_checking[0]} {comments_checking[1]} {comments_checking[2]} {comments_checking[3]} {comments_checking[4]} {e}")
+            bases.db.log('Error', str(comments_checking[0]), str(comments_checking[1]), comments_checking[2],
+                         str(comments_checking[3]), str(comments_checking[4]), str(e))
+        else:
+            if c.debugsearch:
+                print("Completed loop successfully.")
+
+        finally:
+            if c.debugsearch:
+                print("Sleeping...")
+            time.sleep(30)
+    else:
         comments_checking = [None, None, None, None, None, None, None]
         session = login
         if c.debugsearch:
@@ -289,7 +349,7 @@ def bot_main(login):
             if c.debugsearch:
                 print("Checking in sub " + str(sub))
             for comment in session.subreddit(sub).comments(limit=20):  # Need to check for locked thread, throws except
-                if comment.id not in comments_checked and comment.author != c.reddit_user\
+                if comment.id not in comments_checked and comment.author != c.reddit_user \
                         and len(comment.body.lower()) > 0:
                     comments_checking[1] = comment.author
                     comments_checking[3] = comment.id
@@ -309,29 +369,6 @@ def bot_main(login):
                     comments_checking[4] = thread.id
                     comments_checked.append(thread.id)
                     checkbasesthread(thread)
-
-    except prawcore.exceptions.ResponseException as e:
-        print("Response error, server probably busy. Sleeping and retrying. " + str(e))
-        time.sleep(60)
-
-    except prawcore.exceptions.OAuthException as e:
-        bases.db.log('Login Error', None, None, None, None, None, str(e))
-        print("Invalid credentials while logging in!")
-        time.sleep(60)
-
-    except ConnectionError as e:
-        print("Connection error, sleeping and retrying. " + str(e))
-        time.sleep(60)
-
-    except Exception as e:
-        print(f"Logging {comments_checking[0]} {comments_checking[1]} {comments_checking[2]} {comments_checking[3]} {comments_checking[4]} {e}")
-        bases.db.log('Error', str(comments_checking[0]), str(comments_checking[1]), comments_checking[2],
-                     str(comments_checking[3]), str(comments_checking[4]), str(e))
-    else:
-        if c.debugsearch:
-            print("Completed loop successfully.")
-
-    finally:
         if c.debugsearch:
             print("Sleeping...")
         time.sleep(30)
