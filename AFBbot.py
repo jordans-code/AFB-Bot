@@ -23,9 +23,8 @@ comments_checked = []  # This is a fail safe for if the log fails to refrain fro
 comment_checking = [None, None, None, None, None, None, None]
 
 
-
 def checkbases(comment):
-  """Checks all base instances and a comment for a rating."""
+    """Checks all base instances and a comment for a rating."""
     linebreaktext = list(comment.body.lower())
     checktext = filtertext(linebreaktext).split()
     stringtext = ''.join(checktext)
