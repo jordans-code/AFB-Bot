@@ -15,11 +15,15 @@ def getweather(location):
         wind = str(weather['current_conditions']['wind']['speed'])
         humidity = str(weather['current_conditions']['humidity'])
         location = str(weather['location']['name'])
+        if wind == "calm":
+            wind = f"the wind is {wind}"
+        else:
+            wind = f"and wind at {wind} mph"
         if condition == "":
             final = f"It is {temperature}° with humidity at {humidity}% and wind at {wind} mph in {location}. It feels like {feels_like}°\n\n"
         else:
             final = f"""It is {condition} and {temperature}° with humidity at {humidity}% 
-    and wind at {wind} mph in {location}. It feels like {feels_like}°\n\n"""
+    {wind} in {location}. It feels like {feels_like}°\n\n"""
         return final
 
     except Exception as e:
