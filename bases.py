@@ -141,7 +141,7 @@ mcguire = Base("Trenton, New Jersey. United States.", None,
 hickam = Base("Honolulu, Hawaii. United States.", "PACAF", "JB Pearl Harbor-Hickam", ["hickam"])
 lackland = Base("San Antonio, Texas. United States.", "AETC", "JB San Antonio", ["lackland", "jbsa", "randolph"])
 andersen = Base("Yigo, Guam.", None, "Joint Region Marianas (Andersen AFB)", ["andersen", "marianas"])
-
+cape = Base("Bourne, Massachusetts. United States.", "AFSPC", "Joint Base Cape Cod", ["cape", "cod"])
 
 
 
@@ -192,7 +192,7 @@ aludeid = Base("Doha, Qatar.", "AFCENT", "Al Udeid Air Base", ["udeid", "deid", 
 alialsalem = Base("Kuwait.", "AFCENT", "Ali Al Salem Air Base", ["alsalem", "salem"])
 bagram = Base("Bagram, Afghanistan.", "AFCENT", "Bagram Airfield", ["bagram"])
 kabul = Base("Afghanistan.", "AFCENT", "Kabul International Airport", ["kabul"])
-kandahar = Base("Afghanistan.", "AFCENT", "Kandahar Airfield", ["kandahar"])
+kandahar = Base("Kandahar, Afghanistan.", "AFCENT", "Kandahar Airfield", ["kandahar", "khandahar"])
 sheikisa = Base("Bahrain", "AFCENT", "Sheik Isa Air Base", ["sheik", "isa"])
 shindand = Base("Afghanistan.", "AFCENT", "Shindand Air Base", ["shindand"])
 thumrait = Base("Salalah, Dhofar, Oman.", "AFCENT", "RAFO Thumrait", ["thumrait"])  # Incorrect location intentional for weather
@@ -203,7 +203,7 @@ zama = Base("Sagamihara, Japan.", None, "Camp Zama", ["zama"])
 
 # Have abstained from adding ANG bases due to a lack of mentions and to save time.
 
-all_bases = [altus, arnold, barksdale, beale, buckley, cannon, cavalier, columbus, creech, davismonthan,
+all_bases = [altus, arnold, barksdale, beale, buckley, cape, cannon, cavalier, columbus, creech, davismonthan,
              dover, dyess, edwards, eglin, elisworth, warren, fairchild, jackson, meade, goodfellow, grandforks,
              hanscom, hill, holloman, hurlburt, keesler, kirtland, laughlin, littlerock, losangeles, luke,
              macdill, malmstrom, maxwell, mcconnell, minot, moody, mountainhome, nellis, offutt, patrick,
