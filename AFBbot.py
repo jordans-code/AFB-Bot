@@ -33,22 +33,22 @@ def checkbases(comment):
         if c.debugsearch:
             print("I have already handled this comment. " + str(comment.id))
         pass
-    elif "rate" in checktext and checkvalidrating(stringtext):
-        for base in bases.all_bases:
-            for name in base.names:
-                if name in checktext:
-                    if c.debugsearch:
-                        print("User appears to be rating base.")
-                    rating = getratingnumber(ratingfilter(list(comment.body.lower())))
-                    if not c.debugnoreply:
-                        rated_reply(comment, base, rating, "comment")
-                    return True  # Prevents multiple base triggers creating multiple comments.
     else:
         for trigger in c.triggers:
             if trigger.lower() in checktext:
                 if "stats" in checktext:
                     statsreply(comment, comment.submission.id)
                     return True
+                elif "rate" in checktext and checkvalidrating(stringtext):
+                    for base in bases.all_bases:
+                        for name in base.names:
+                            if name in checktext:
+                                if c.debugsearch:
+                                    print("User appears to be rating base.")
+                                rating = getratingnumber(ratingfilter(list(comment.body.lower())))
+                                if not c.debugnoreply:
+                                    rated_reply(comment, base, rating, "comment")
+                                return True  # Prevents multiple base triggers creating multiple comments.
                 else:
                     for base in bases.all_bases:
                         for name in base.names:
@@ -69,24 +69,23 @@ def checkbasesthread(thread):
         if c.debugsearch:
             print("I have already handled this comment. " + str(thread.id))
         pass
-
-    elif "rate" in checktext and checkvalidrating(stringtext):
-        for base in bases.all_bases:
-            for name in base.names:
-                if name in checktext:
-                    comments_checking[0] = name
-                    if c.debugsearch:
-                        print("User appears to be rating base.")
-                    rating = getratingnumber(ratingfilter(list(thread.selftext.lower())))
-                    comments_checking[2] = rating
-                    rated_reply(thread, base, rating, "thread")
-                    return True  # Prevents multiple base triggers creating multiple comments.
     else:
         for trigger in c.triggers:
             if trigger.lower() in checktext:
                 if "stats" in checktext:
                     statsreply(thread.id, thread.id)
                     return True
+                elif "rate" in checktext and checkvalidrating(stringtext):
+                    for base in bases.all_bases:
+                        for name in base.names:
+                            if name in checktext:
+                                comments_checking[0] = name
+                                if c.debugsearch:
+                                    print("User appears to be rating base.")
+                                rating = getratingnumber(ratingfilter(list(thread.selftext.lower())))
+                                comments_checking[2] = rating
+                                rated_reply(thread, base, rating, "thread")
+                                return True  # Prevents multiple base triggers creating multiple comments.
                 else:
                     for base in bases.all_bases:
                         for name in base.names:
