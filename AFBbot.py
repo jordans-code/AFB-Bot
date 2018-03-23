@@ -1,4 +1,4 @@
-"""Bot to check Reddit comments and threads for USAF base ratings."""
+"""Bot to check Reddit comments and threads for USAF base ratings or provide base information."""
 
 import praw
 import prawcore
@@ -6,6 +6,7 @@ import constants as c
 import time
 import bases
 import stats
+
 
 def reddit_login():
     """Creates instance of Reddit login."""
@@ -20,7 +21,7 @@ def reddit_login():
 
 
 comments_checked = []  # This is a fail safe for if the log fails to refrain from rechecking posts.
-comment_checking = [None, None, None, None, None, None, None]
+comment_checking = [None, None, None, None, None, None, None]  # Global var for the comment being checked, for errors.
 
 
 def checkbases(comment):
@@ -158,10 +159,10 @@ def filterqtext(text):
                             return ""
                         else:
                             return checkquote
-            else:
-                if c.debugsearch:
-                    print("No line break found, not replying.")
-                return ""
+        else:
+            if c.debugsearch:
+                print("No line break found, not replying.")
+            return ""
     elif ">" in checkquote:
         if c.debugsearch:
             print("Quote within the text, will not reply.")
@@ -216,9 +217,8 @@ def getratingnumber(text):
     for i in sorted(delete, reverse=True):
         del text[i]
 
-    finalnumber = []
-
-    for char in text:
+    finalnumbers = []  # List of lists of numbers, decimals and hyphens in the comment after "rate".
+    for char in text:  # Filters out anything besides integers, decimals and hyphens.
         number = []
         appenededperiod = False  # Handles decimals and extra periods, places the first one it finds in the number.
         charlist = list(char)
@@ -227,28 +227,31 @@ def getratingnumber(text):
                 if not appenededperiod:
                     number.append(".")
                     appenededperiod = True
+            elif charlist[i] == "-" and i == 0:  # Checks for negative number, only if the - is the first char.
+                number.append("-")
             else:
-                number.append(str(charlist[i]))
+                try:
+                    int(charlist[i])
+                    number.append(charlist[i])
+                except ValueError:
+                    pass
         if c.debugsearch:
-            print(str(number))
-        truenumber = ''.join(str(i) for i in number)
-        finalnumber.append(truenumber)
+            print("Filtered non numbers and extra decimals - " + str(number))
+        finalnumbers.append(number)
     if c.debugsearch:
-        print(str(finalnumber))
-
-    numbers = [float(x) for x in finalnumber if not x.isalpha()]
-    if c.debugsearch:
-        print(str(numbers))
-
-    if numbers[0] > 10:
+        print("Filtered everything but numbers and decimal point: " + str(finalnumbers))
+    finalnumberlist = finalnumbers[0]  # If multiple numbers like "9 out of 10", takes the first.
+    joinednumber = ''.join(str(i) for i in finalnumberlist)
+    floatnumber = float(joinednumber)
+    if floatnumber > 10:
         return 10.00
-    elif 1 <= numbers[0] <= 10:
-        rounded = "%.2f" % numbers[0]
+    elif 1 <= floatnumber <= 10:
+        rounded = "%.2f" % floatnumber
         return rounded
-    elif numbers[0] <= 1:
+    elif floatnumber <= 1:
         return 1.00
     else:
-        print("Something weird happened with the getrating number, " + str(numbers[0]))
+        print("Something weird happened with the getrating number, " + str(floatnumber))
         return 10.00
 
 
@@ -261,11 +264,13 @@ def reply(comment, base):
 Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n"""
                       + c.bot_signature)
 
+
 def statsreply(comment, threadid):
     print("Replying with stats to " + str(comment.id))
     if not c.debugnoreply:
         comment.reply(stats.Stats.getreply(stats.thestats) + c.bot_signature)
         bases.db.log("Stats", None, str(comment.author), None, str(comment.id), str(threadid), None)
+
 
 def rated_reply(comment, base, rating, self):
     """Acknowledges a base rating and replies with the updated rating"""
@@ -273,7 +278,7 @@ def rated_reply(comment, base, rating, self):
         print("Adding rating to " + str(comment.id))  # Checks if they have already added a rating to this base
         if base.addrating(str(comment.author), rating, comment.id, comment.submission.id):
             if not c.debugnoreply:
-                comment.reply(f'''Your rating has been added to {base.displayname}.\n\n
+                comment.reply(f'''Your rating of {str(rating)} has been added to {base.displayname}.\n\n
 Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n'''
                               + c.bot_signature)
         else:
@@ -287,7 +292,7 @@ Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.
         if base.addrating(str(comment.author), rating, comment.id,
                           comment.id):
             if not c.debugnoreply:  # Checks if they have already added a rating to this base
-                comment.reply(f'''Your rating has been added to {base.displayname}.\n\n
+                comment.reply(f'''Your rating of {str(rating)} has been added to {base.displayname}.\n\n
 Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n'''
                               + c.bot_signature)
         else:
