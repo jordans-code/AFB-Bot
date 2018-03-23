@@ -11,7 +11,6 @@ def getweather(location):
         condition = str(weather['current_conditions']['text']).lower()
         feels_like = str(weather['current_conditions']['feels_like'])
         temperature = str(weather['current_conditions']['temperature'])
-        print(str(temperature))
         wind = str(weather['current_conditions']['wind']['speed'])
         humidity = str(weather['current_conditions']['humidity'])
         location = str(weather['location']['name'])
@@ -28,7 +27,7 @@ def getweather(location):
 
     except Exception as e:
         print(location + " has an invalid location for weather!")
-        database.log(f"weather", {location}, None, None, None, None, "Weather error, most likely invalid location.")
+        database.log(f"weather", str({location}), None, None, None, None, "Weather error, most likely invalid location.")
         return ""
 
 
