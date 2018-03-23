@@ -72,7 +72,7 @@ davismonthan = Base("Tucson, Arizona. United States.", "ACC",
 dover = Base("Dover, Delaware. United States.", "AMC", "Dover Air Force Base", ["dover"])
 dyess = Base("Abilene, Texas. United States.", "AFGSC", "Dyess Air Force Base", ["dyess"])
 edwards = Base("Edwards, California. United States.", "AFMC", "Edwards Air Force Base", ["edwards"])
-eglin = Base("Valparaiso, Florida. United States.", "AFMC", "Eglin Air Force Base", ["eglin"])
+eglin = Base("Niceville, Florida. United States.", "AFMC", "Eglin Air Force Base", ["eglin"])
 elisworth = Base("Box Elder, South Dakota. United States.", "AFGSC", "Elisworth Air Force Base", ["elisworth"])
 warren = Base("Cheyenne, Wyoming. United States.", "AFGSC",
               "Francis E. Warren Air Force Base", ["francis", "warren", "francis-warren"])
@@ -191,7 +191,7 @@ aldhafra = Base("United Arab Emirates.", "AFCENT", "Al Dhafra Air Base", ["dhafr
 aludeid = Base("Doha, Qatar.", "AFCENT", "Al Udeid Air Base", ["udeid", "deid", "auab"])
 alialsalem = Base("Kuwait.", "AFCENT", "Ali Al Salem Air Base", ["alsalem", "salem"])
 bagram = Base("Bagram, Afghanistan.", "AFCENT", "Bagram Airfield", ["bagram"])
-kabul = Base("Afghanistan.", "AFCENT", "Kabul International Airport", ["kabul"])
+kabul = Base("Kabul, Afghanistan.", "AFCENT", "Kabul International Airport", ["kabul"])
 kandahar = Base("Kandahar, Afghanistan.", "AFCENT", "Kandahar Airfield", ["kandahar", "khandahar"])
 sheikisa = Base("Bahrain", "AFCENT", "Sheik Isa Air Base", ["sheik", "isa"])
 shindand = Base("Afghanistan.", "AFCENT", "Shindand Air Base", ["shindand"])
