@@ -59,7 +59,8 @@ def query_rating(base):
     ratings = ratings.translate({ord(i): None for i in '(),'})
     userratings = count_ratings(base)
     ratingssum = float(ratings)
-    print(f"Querying rating of {base}, there are {userratings} ratings")
+    if constants.debugsearch:
+        print(f"Querying rating of {base}, there are {userratings} ratings")
     if userratings == 0:
         return 10
     else:
