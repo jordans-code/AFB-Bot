@@ -98,9 +98,9 @@ def checkbasesthread(thread):
 def ratingfilter(text):
     """Filters characters from the rating text string."""
     noquotetext = filterqtext(text)
-    for char in noquotetext:
-        if char == "\n":
-            noquotetext[char] = ""
+    for num in range(len(noquotetext)):
+        if noquotetext[num] == "\n":
+            noquotetext[num] = ""
     if c.debugsearch:
         print("start of filtered text: " + str(noquotetext))
     filterchars = '!@#$%^&*()+<>=,?:;'
@@ -164,7 +164,7 @@ def filterqtext(text):
                 return ""
     elif ">" in checkquote:
         if c.debugsearch:
-            print("Quote within the text, will noy reply.")
+            print("Quote within the text, will not reply.")
         return ""
     return checkquote
 
