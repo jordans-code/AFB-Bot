@@ -14,7 +14,7 @@
 
 - To rate a base simply include the bot's name (**afbbot**), the word "**rate**", a **number** (can be anything but will be rounded between 1-10), and the **base name**. The only thing that matters is that the rating number comes after the word "rate".
 
->I was at **langley** for 2 years and the DFAC sucks! I **rate** it a **3.5** at best.
+>I was at **langley** for 2 years and the DFAC sucks! I **rate** it a **3.5** at best **AFBbot**.
 
 - To summon the bot for overall statistics, simply include the bot's name (**afbbot**) and "**stats**".
 
