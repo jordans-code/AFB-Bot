@@ -9,14 +9,14 @@
 
 **Usage:**
 
-- To summon the bot for base information, simply include the bot's name (afbbot) and a base name, ex: Langley. The base name triggers are keywords and nicknames. If you have any suggestions for additional bases or nicknames please let me know.
+- To summon the bot for base information, simply include the bot's name (**afbbot**) and a base name, ex: **Langley**. The base name triggers are keywords and nicknames. If you have any suggestions for additional bases or nicknames please let me know.
 > **AFBbot**, tell me about **Langley**!
 
-- To rate a base you do not need to mention the bot's name, simply include the word "rate" along with a number (can be anything but will be rounded between 1-10) and the base name. The only thing that matters is that the rating number comes after the word "rate".
+- To rate a base you do not need to mention the bot's name, simply include the word "**rate**" along with a **number** (can be anything but will be rounded between 1-10) and the **base name**. The only thing that matters is that the rating number comes after the word "rate".
 
 >I was at **langley** for 2 years and the DFAC sucks! I **rate** it a **3.5** at best.
 
-- To summon the bot for overall statistics, simply include the bot's name (afbbot) and "stats".
+- To summon the bot for overall statistics, simply include the bot's name (**afbbot**) and "**stats**".
 
 >**AFBbot**, lets see those **stats**!
 
