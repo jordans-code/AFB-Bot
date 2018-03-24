@@ -1,7 +1,7 @@
 # AFB-Bot  - A Reddit Bot
 
 **Features:**
-* When summoned for information the bot will currently provide the full base name, the MAJCOM, the city/state/country, current weather information, and the overall base rating.
+* When summoned for information the bot will currently provide the full base name, the MAJCOM, the city/state/country, links to recent discussions on /r/ratemyafb, a sneak peak of the top comment from one of those discussions, current weather information, and the overall base rating.
 
 * Ability to easily rate bases / change your previous rating of a base.
 
@@ -22,7 +22,7 @@
 
 **Planned Features:**
 
-- Have the bot link the three most recent discussions for the base on /r/ratemyafb when called.
+- Add the ability to request a blacklist addition. Currently I have to manually add usernames/submission id's/comment id's to the blacklist to not appear on sneak peaks/get replies from the bot. I would like to give select users the ability to simply PM the bot with the comment/thread/user id and the word "blacklist".
 
 - Add additional bases as they are suggested. I did not include many National Guard / Reserve bases due to a lack of mentions, however if you think a base should be added please let me know and it can be easily done. Undisclosed locations will obviously not be added.
 
