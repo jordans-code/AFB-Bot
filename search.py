@@ -18,13 +18,13 @@ def getthree(session, base):
         allsubmissions.append(submission)
     if len(allsubmissions) >= 3:
         threesubmissions = [allsubmissions[2], allsubmissions[1], allsubmissions[0]]
-        topcomment = gettopcomment(threesubmissions[0])
+        topcomment = gettopcomment(threesubmissions[0], threesubmissions[1], threesubmissions[2])
     elif len(allsubmissions) == 2:
         threesubmissions = [allsubmissions[1], allsubmissions[0]]
-        topcomment = gettopcomment(threesubmissions[0])
+        topcomment = gettopcomment(threesubmissions[0], threesubmissions[1], False)
     elif len(allsubmissions) == 1:
         threesubmissions = [allsubmissions[0]]
-        topcomment = gettopcomment(threesubmissions[0])
+        topcomment = gettopcomment(threesubmissions[0], False, False)
     else:
         return "", ""
     return threesubmissions, topcomment
@@ -67,8 +67,17 @@ def getformat(sub, single):
     return full
 
 
-def gettopcomment(sub):
+def gettopcomment(sub1, sub2, sub3):
     """Gets a list of comments and sorts by top, and checks if the comment is blacklisted"""
+    if db.checkblacklisted(False, sub1.id):
+        if sub2 and not db.checkblacklisted(False, sub2.id):
+            sub = sub2
+        elif sub3 and not db.checkblacklisted(False, sub3.id):
+            sub = sub3
+        else:
+            return ""
+    else:
+        sub = sub1
     sub.comment_sort = 'top'
     commentlist = sub.comments.list()
     commentlist.sort(key=lambda comment: comment.score, reverse=True)
