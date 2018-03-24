@@ -1,6 +1,7 @@
 # AFB-Bot  - A Reddit Bot
 
 **Features:**
+
 * When summoned for information the bot will currently provide the full base name, the MAJCOM, the city/state/country, links to recent discussions on /r/ratemyafb, a sneak peak of the top comment from one of those discussions, current weather information, and the overall base rating.
 
 * Ability to easily rate bases / change your previous rating of a base.
