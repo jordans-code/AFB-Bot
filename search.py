@@ -1,11 +1,10 @@
 
 def getsearch(session, base):
     threesubmissions = getthree(session, base)
-    reply = getreply(threesubmissions)
-    if reply == "":
+    if not threesubmissions:
         return ""
-    else:
-        return reply
+    reply = getreply(threesubmissions)
+    return reply
 
 
 def getthree(session, base):
@@ -13,8 +12,6 @@ def getthree(session, base):
     allsubmissions = []
     for submission in session.subreddit('ratemyafb').search(f"{base}"):
         allsubmissions.append(submission)
-        print(submission.title)
-    print(str(allsubmissions))
     if len(allsubmissions) >= 3:
         threesubmissions = [allsubmissions[0], allsubmissions[1], allsubmissions[2]]
     elif len(allsubmissions) == 2:
@@ -45,7 +42,6 @@ def getformat(sub):
     title = list(sub.title)
     if len(title) > maxlength:
         del title[maxlength:len(title)]
-    print(str(title))
     joinedtitle = ''.join(title)
     full = f"[{joinedtitle}]({url})"
     return full
