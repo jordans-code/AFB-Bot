@@ -219,5 +219,6 @@ all_bases = [altus, arnold, barksdale, beale, buckley, cape, cannon, cavalier, c
 def maketables():
     print("Creating tables...")
     db.create_logtable()
+    db.create_blacklist()
     for base in all_bases:
         db.create_table(base.names[0])
