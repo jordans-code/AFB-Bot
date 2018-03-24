@@ -317,7 +317,7 @@ def bot_main(login):
                     print("Checking in sub " + str(sub))
                 for comment in session.subreddit(sub).comments(limit=20):  # Need to check for locked thread, throws except
                     if comment.id not in comments_checked and comment.author != c.reddit_user\
-                            and len(comment.body.lower()) > 0:
+                            and len(comment.body.lower()) > 0 and not bases.db.checkblacklisted(comment.author, False):
                         comments_checking[1] = comment.author
                         comments_checking[3] = comment.id
                         comments_checking[4] = comment.submission.id
@@ -330,7 +330,8 @@ def bot_main(login):
                 if c.debugsearch:
                     print("Checking threads...")
                 for thread in session.subreddit(sub).new(limit=5):
-                    if thread.id not in comments_checked and len(thread.selftext.lower()) > 0:
+                    if thread.id not in comments_checked and len(thread.selftext.lower()) > 0 and not\
+                            bases.db.checkblacklisted(thread.author, False):
                         comments_checking[1] = thread.author
                         comments_checking[3] = thread.id
                         comments_checking[4] = thread.id
@@ -379,7 +380,7 @@ def bot_main(login):
                     if c.debugsearch:
                         print("Comment " + str(comment.id) + " is not in " + str(comments_checked))
                     comments_checked.append(comment.id)
-                    checkbases(comment)
+                    checkbases(comment, session)
                 else:
                     continue
             if c.debugsearch:
@@ -390,7 +391,7 @@ def bot_main(login):
                     comments_checking[3] = thread.id
                     comments_checking[4] = thread.id
                     comments_checked.append(thread.id)
-                    checkbasesthread(thread)
+                    checkbasesthread(thread, session)
         if c.debugsearch:
             print("Sleeping...")
         time.sleep(30)
