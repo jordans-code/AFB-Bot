@@ -6,7 +6,7 @@ import constants as c
 import time
 import bases
 import stats
-
+import search
 
 def reddit_login():
     """Creates instance of Reddit login."""
@@ -24,7 +24,7 @@ comments_checked = []  # This is a fail safe for if the log fails to refrain fro
 comment_checking = [None, None, None, None, None, None, None]  # Global var for the comment being checked, for errors.
 
 
-def checkbases(comment):
+def checkbases(comment, session):
     """Checks all base instances and a comment for a rating."""
     linebreaktext = list(comment.body.lower())
     checktext = filtertext(linebreaktext).split()
@@ -55,11 +55,11 @@ def checkbases(comment):
                             if name in checktext:
                                 bases.db.log('reply', base.names[0], name, None, comment.id,
                                              comment.submission.id, None)
-                                reply(comment, base)
+                                reply(comment, base, session)
                                 return True  # Prevents multiple triggers creating multiple comments.
 
 
-def checkbasesthread(thread):
+def checkbasesthread(thread, session):
     """Checks all base instances and a thread for a rating."""
     linebreaktext = list(thread.selftext.lower())
     checktext = filtertext(linebreaktext).split()
@@ -91,7 +91,7 @@ def checkbasesthread(thread):
                         for name in base.names:
                             if name in checktext:
                                 bases.db.log('reply', base.names[0], name, None, thread.id, thread.id, None)
-                                reply(thread, base)
+                                reply(thread, base, session)
                                 return True  # Prevents multiple triggers creating multiple comments.
 
 
@@ -254,12 +254,13 @@ def getratingnumber(text):
         return 10.00
 
 
-def reply(comment, base):
+def reply(comment, base, session):
     """Replies to a comment with the base rating."""
     print("Adding reply to " + str(comment.id))
     if not c.debugnoreply:
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
 {stats.weather.getweather(base.location)}
+{search.getsearch(session, base.names[0])}
 Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n"""
                       + c.bot_signature)
 
@@ -323,7 +324,7 @@ def bot_main(login):
                         if c.debugsearch:
                             print("Comment " + str(comment.id) + " is not in " + str(comments_checked))
                         comments_checked.append(comment.id)
-                        checkbases(comment)
+                        checkbases(comment, session)
                     else:
                         continue
                 if c.debugsearch:
@@ -334,7 +335,7 @@ def bot_main(login):
                         comments_checking[3] = thread.id
                         comments_checking[4] = thread.id
                         comments_checked.append(thread.id)
-                        checkbasesthread(thread)
+                        checkbasesthread(thread, session)
 
         except prawcore.exceptions.ResponseException as e:
             print("Response error, server probably busy. Sleeping and retrying. " + str(e))
