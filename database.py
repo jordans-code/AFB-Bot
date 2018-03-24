@@ -27,6 +27,10 @@ def create_logtable():
     username TEXT, value REAL, commentid TEXT, threadid TEXT, message TEXT)''')
 
 
+def create_blacklist():
+    c.execute('''CREATE TABLE IF NOT EXISTS blacklist(username TEXT, commentid TEXT)''')
+
+
 def data_entry(base, name, rating, commentid, threadid):
     unix = time.time()
     now = datetime.datetime.now()
@@ -38,6 +42,23 @@ def data_entry(base, name, rating, commentid, threadid):
     c.execute("INSERT INTO log VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (unix, datestamp, 'rating', base,
                                                                     name, rating, commentid, threadid, None),)
     db.commit()
+
+
+def checkblacklisted(User, ID):
+    if not User:
+        c.execute(f"SELECT rowid FROM blacklist WHERE commentid = '{ID}'")
+        existing = c.fetchall()
+        if len(existing) == 0:
+            return False
+        else:
+            return True
+    if not ID:
+        c.execute(f"SELECT rowid FROM blacklist WHERE username = '{User}'")
+        existing = c.fetchall()
+        if len(existing) == 0:
+            return False
+        else:
+            return True
 
 
 def change_entry(base, name, rating, commentid, threadid):
