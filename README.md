@@ -4,7 +4,7 @@
 
 * When summoned for information the bot will currently provide the full base name, the MAJCOM, the city/state/country, links to recent discussions on /r/ratemyafb, a sneak peak of the top comment from one of those discussions, current weather information, and the overall base rating.
 
-* Ability to easily rate bases / change your previous rating of a base.
+* Ability to easily rate bases / change your previous rating of a base in up to three fields: "rate", "arearate", and "housingrate". 
 
 * Ability to summon the bot for overall statistics. The bot will provide the highest and lowest rated bases along with the current coldest and warmest temperature bases. 
 
@@ -13,9 +13,9 @@
 - To summon the bot for base information, simply include the bot's name (**afbbot**) and a base name, ex: **Langley**. The base name triggers are keywords and nicknames. If you have any suggestions for additional bases or nicknames please let me know.
 > **AFBbot**, tell me about **Langley**!
 
-- To rate a base simply include the bot's name (**afbbot**), the word "**rate**", a **number** (can be anything but will be rounded between 1-10), and the **base name**. The only thing that matters is that the rating number comes after the word "rate".
+- To rate a base simply include the bot's name (**afbbot**), one or more of the following words: "**rate**"/"**arearate**"/"**housingrate**", a **number** (can be anything but will be rounded between 1-10) after each rating word, and the **base name**. The only thing that matters is that the rating number comes after the rating word.
 
->I was at **langley** for 2 years and the DFAC sucks! I **rate** it a **3.5** at best **AFBbot**.
+>I was at **langley** for 2 years and the housing is great! Overall I **rate** it a **8**, and I arearate it **9.5** **AFBbot**.
 
 - To summon the bot for overall statistics, simply include the bot's name (**afbbot**) and "**stats**".
 
