@@ -227,10 +227,9 @@ def getratingnumber(text, rtype):
         if word == rtype:
             for z in range(0, i):
                 delete.append(z)
-            continue
+            break
     for i in sorted(delete, reverse=True):
         del text[i]
-
     delete = []  # deletes every index that begins with an alpha character, only need numbers/periods at this point.
     for i in range(len(text)):
         word = list(text[i])
