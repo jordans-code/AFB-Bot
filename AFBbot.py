@@ -8,6 +8,7 @@ import bases
 import stats
 import search
 
+
 def reddit_login():
     """Creates instance of Reddit login."""
     if c.debuglogin:
@@ -39,16 +40,8 @@ def checkbases(comment, session):
                 if "stats" in checktext:
                     statsreply(comment, comment.submission.id)
                     return True
-                elif "rate" in checktext and checkvalidrating(stringtext):
-                    for base in bases.all_bases:
-                        for name in base.names:
-                            if name in checktext:
-                                if c.debugsearch:
-                                    print("User appears to be rating base.")
-                                rating = getratingnumber(ratingfilter(list(comment.body.lower())))
-                                if not c.debugnoreply:
-                                    rated_reply(comment, base, rating, "comment")
-                                return True  # Prevents multiple base triggers creating multiple comments.
+                elif checkforrating(comment, checktext, stringtext, False):
+                    return True
                 else:
                     for base in bases.all_bases:
                         for name in base.names:
@@ -57,6 +50,47 @@ def checkbases(comment, session):
                                              comment.submission.id, None)
                                 reply(comment, base, session)
                                 return True  # Prevents multiple triggers creating multiple comments.
+
+
+def checkforrating(post, checktext, stringtext, issubmission):
+    ratingtypes = ["rate", "arearate", "housingrate"]
+    israting = False
+    truebase = None
+    rtypes = []
+    rating = None
+    update = True
+    for rtype in ratingtypes:
+        if rtype in checktext and checkvalidrating(stringtext, rtype):
+            for base in bases.all_bases:
+                for name in base.names:
+                    if name in checktext:
+                        if c.debugsearch:
+                            print("User appears to be rating base.")
+                        truebase = base
+                        rtypes.append(rtype)
+                        if not issubmission:
+                            rating = getratingnumber(ratingfilter(list(post.body.lower())), rtype)
+                            if base.addrating(str(post.author), rtype, rating, post.id, post.submission.id):
+                                update = False
+                            else:
+                                base.changerating(str(post.author), rtype, rating, post.id, post.submission.id)
+                        else:
+                            rating = getratingnumber(ratingfilter(list(post.selftext.lower())), rtype)
+                            if base.addrating(str(post.author), rtype, rating, post.id, post.id):
+                                update = False
+                            else:
+                                base.changerating(str(post.author), rtype, rating, post.id, post.id)
+
+
+
+                        israting = True
+
+    if israting:
+        if not c.debugnoreply:
+            rated_reply(post, truebase, rtypes, rating, update)
+            return True
+    else:
+        return False  # Prevents multiple base triggers creating multiple comments.
 
 
 def checkbasesthread(thread, session):
@@ -75,17 +109,8 @@ def checkbasesthread(thread, session):
                 if "stats" in checktext:
                     statsreply(thread.id, thread.id)
                     return True
-                elif "rate" in checktext and checkvalidrating(stringtext):
-                    for base in bases.all_bases:
-                        for name in base.names:
-                            if name in checktext:
-                                comments_checking[0] = name
-                                if c.debugsearch:
-                                    print("User appears to be rating base.")
-                                rating = getratingnumber(ratingfilter(list(thread.selftext.lower())))
-                                comments_checking[2] = rating
-                                rated_reply(thread, base, rating, "thread")
-                                return True  # Prevents multiple base triggers creating multiple comments.
+                elif checkforrating(thread, checktext, stringtext, True):
+                    return True  # Prevents multiple base triggers creating multiple comments.
                 else:
                     for base in bases.all_bases:
                         for name in base.names:
@@ -169,9 +194,9 @@ def filterqtext(text):
     return checkquote
 
 
-def checkvalidrating(comment):
+def checkvalidrating(comment, rtype):
     """Validates rating if debugsearch is enabled."""
-    splitlist = comment.split("rate")
+    splitlist = comment.split(rtype)
     del splitlist[0]
     joinedlist = ''.join(splitlist)
     if c.debugsearch:
@@ -190,7 +215,7 @@ def checkvalidrating(comment):
         return True
 
 
-def getratingnumber(text):
+def getratingnumber(text, rtype):
     """Determines the rating of a base.
 
     Detects the usage of 'rate' in a string,
@@ -199,7 +224,7 @@ def getratingnumber(text):
     delete = []  # deletes everything up to and including the indexes "rate"
     for i in range(len(text)):
         word = text[i]
-        if word == 'rate':
+        if word == rtype:
             for z in range(0, i):
                 delete.append(z)
             continue
@@ -261,7 +286,10 @@ def reply(comment, base, session):
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
 {stats.weather.getweather(base.location)}
 {search.getsearch(session, base.names[0])}
-Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n"""
+Overall base rating: {str(base.gettrueoverallrating())}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings.\n\n
+General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. | Area rating: 
+{str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. | Housing rating: 
+{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n"""
                       + c.bot_signature)
 
 
@@ -272,35 +300,47 @@ def statsreply(comment, threadid):
         bases.db.log("Stats", None, str(comment.author), None, str(comment.id), str(threadid), None)
 
 
-def rated_reply(comment, base, rating, self):
+def rated_reply(comment, base, rtypes, rating, update):
     """Acknowledges a base rating and replies with the updated rating"""
-    if self == "comment":
-        print("Adding rating to " + str(comment.id))  # Checks if they have already added a rating to this base
-        if base.addrating(str(comment.author), rating, comment.id, comment.submission.id):
-            if not c.debugnoreply:
-                comment.reply(f'''Your rating of {str(rating)} has been added to {base.displayname}.\n\n
-Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n'''
-                              + c.bot_signature)
+    singlechange = False
+    if len(rtypes) == 1:
+        singlechange = True
+        if rtypes[0] == "rate":
+            ratingtdisplay = "general rating"
+        elif rtypes[0] == "arearate":
+            ratingtdisplay = "area rating"
         else:
-            base.changerating(str(comment.author), rating, comment.id, comment.submission.id)
+            ratingtdisplay = "housing rating"
+    overallrating = str(base.gettrueoverallrating())
+
+    print(f"Adding {rtypes} to " + str(base.names[0]) + "  " + str(comment.id))  # Checks if they have already added a rating to this base
+    if singlechange:
+        if not update:
             if not c.debugnoreply:
-                comment.reply(f'''Your rating of {base.displayname} has been changed to {str(rating)}.  
-Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n'''
-                              + c.bot_signature)
+                comment.reply(f'''Your {ratingtdisplay} of {str(rating)} has been added to {base.displayname}.\n\n
+Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings.\n\n
+General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. | Area rating: 
+{str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. | Housing rating: 
+{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n'''
++ c.bot_signature)
+        else:
+            if not c.debugnoreply:
+                comment.reply(f'''Your {ratingtdisplay} of {base.displayname} has been changed to {str(rating)}.  
+Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings.\n\n
+General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. | Area rating: 
+{str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. | Housing rating: 
+{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n'''
++ c.bot_signature)
     else:
-        print("Adding rating to " + str(comment.id))
-        if base.addrating(str(comment.author), rating, comment.id,
-                          comment.id):
-            if not c.debugnoreply:  # Checks if they have already added a rating to this base
-                comment.reply(f'''Your rating of {str(rating)} has been added to {base.displayname}.\n\n
-Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n'''
-                              + c.bot_signature)
-        else:
-            base.changerating(str(comment.author), rating, comment.id, comment.id)
-            if not c.debugnoreply:
-                comment.reply(f'''Your rating of {base.displayname} has been changed to {str(rating)}.  
-Base rating: {str(base.getrating())}/10 out of {str(bases.db.count_ratings(base.names[0]))} ratings.\n\n'''
-                              + c.bot_signature)
+        if not c.debugnoreply:
+            comment.reply(f'''Your ratings of {base.displayname} have been recieved.\n\n
+Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings.\n\n
+General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. | Area rating: 
+{str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. | Housing rating: 
+{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n'''
++ c.bot_signature)
+
+
 
 
 def bot_main(login):

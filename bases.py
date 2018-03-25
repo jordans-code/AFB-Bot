@@ -8,21 +8,26 @@ class Base(object):
         self.displayname = displayname
         self.names = names
 
-    def addrating(self, author, rating, commentid, threadid):
-        if db.query_existing(self.names[0], author):
+    def addrating(self, author, rtype, rating, commentid, threadid):
+        if db.query_existing(self.names[0], author, rtype):
             return False
         else:
-            db.data_entry(self.names[0], author, rating, commentid, threadid)
+            db.data_entry(self.names[0], author, rtype, rating, commentid, threadid)
             print(f"Added rating {rating} to {self.names[0]} by {author}")
             return True
 
-    def getrating(self):
-        overallrating = db.query_rating(self.names[0])
+    def getrating(self, rtype):
+        overallrating = db.query_rating(self.names[0], rtype)
         roundedrating = "%.2f" % overallrating
         return roundedrating
 
-    def changerating(self, author, rating, commentid, threadid):
-        db.change_entry(self.names[0], author, rating, commentid, threadid)
+    def gettrueoverallrating(self):
+        truerating = db.query_overallrating(self.names[0])
+        roundedrating = "%.2f" % truerating
+        return roundedrating
+
+    def changerating(self, author, rtype, rating, commentid, threadid):
+        db.change_entry(self.names[0], author, rtype, rating, commentid, threadid)
 
     def getmajcom(self):
         if self.majcom is not None:

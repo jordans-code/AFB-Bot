@@ -19,8 +19,8 @@ class Stats:
         lowest, lowestvalue, highest, highestvalue = Stats.overallratings()
 
         reply = f"""Here are the overall stats,\n\n
-Highest rated base overall: {highest.displayname}. {highestvalue}/10 from {bases.db.count_ratings(highest.names[0])} ratings.\n\n
-Lowest rated base overall: {lowest.displayname}. {lowestvalue}/10 from {bases.db.count_ratings(lowest.names[0])} ratings.\n\n
+Highest rated base overall: {highest.displayname}. {highestvalue}/10 from {bases.db.count_ratings(highest.names[0], False)} ratings.\n\n
+Lowest rated base overall: {lowest.displayname}. {lowestvalue}/10 from {bases.db.count_ratings(lowest.names[0], False)} ratings.\n\n
 Current highest base temperature: {self.warmest.displayname}. {weather.getweather(self.warmest.location)}
 Current lowest base temperature: {self.coldest.displayname}. {weather.getweather(self.coldest.location)}"""
         return reply
@@ -59,8 +59,8 @@ Current lowest base temperature: {self.coldest.displayname}. {weather.getweather
     def overallratings():
         allratings = {}
         for base in bases.all_bases:
-            if bases.db.count_ratings(base.names[0]) != 0:
-                allratings[base.names[0]] = float(bases.Base.getrating(base))
+            if bases.db.count_ratings(base.names[0], False) != 0:
+                allratings[base.names[0]] = float(base.gettrueoverallrating())
         orderedratings = OrderedDict(sorted(allratings.items(), key=lambda a: a[1]))
         lowest = str(list(orderedratings.keys())[0])
         lowestvalue = str(list(orderedratings.values())[0])
@@ -77,7 +77,7 @@ Current lowest base temperature: {self.coldest.displayname}. {weather.getweather
         if highestvalue == 10.0:
             for key, value in orderedratings:
                 if value == 10.0:
-                    tenratings[key] = int(bases.db.count_ratings(key))
+                    tenratings[key] = int(bases.db.count_ratings(key, False))
             orderedcount = OrderedDict(sorted(tenratings.items(), key=lambda a: a[1]))
             highest = str(list(orderedcount.keys())[-1])
             highestvalue = str(list(orderedcount.values())[-1])
