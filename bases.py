@@ -1,6 +1,5 @@
 import database as db
 
-
 class Base(object):
     def __init__(self, location, majcom, displayname, names):
         self.location = location
@@ -78,15 +77,15 @@ dover = Base("Dover, Delaware. United States.", "AMC", "Dover Air Force Base", [
 dyess = Base("Abilene, Texas. United States.", "AFGSC", "Dyess Air Force Base", ["dyess"])
 edwards = Base("Edwards, California. United States.", "AFMC", "Edwards Air Force Base", ["edwards"])
 eglin = Base("Niceville, Florida. United States.", "AFMC", "Eglin Air Force Base", ["eglin"])
-elisworth = Base("Box Elder, South Dakota. United States.", "AFGSC", "Elisworth Air Force Base", ["elisworth"])
+ellsworth = Base("Box Elder, South Dakota. United States.", "AFGSC", "Ellsworth Air Force Base", ["ellsworth"])
 warren = Base("Cheyenne, Wyoming. United States.", "AFGSC",
-              "Francis E. Warren Air Force Base", ["francis", "warren", "francis-warren"])
+              "Francis E. Warren Air Force Base", ["warren", "francis-warren"])
 fairchild = Base("Airway Heights, Washington. United States.", "AMC", "Fairchild Air Force Base", ["fairchild"])
 jackson = Base("Columbia, South Carolina. United States.", None, "Fort Jackson", ["jackson"])
 meade = Base("Odenton, Maryland. United States.", None, "Fort George G. Meade", ["meade"])
 goodfellow = Base("San Angelo, Texas. United States.", "AETC", "Goodfellow Air Force Base", ["goodfellow"])
-grandforks = Base("Grand Forks, North Dakota. United States.", "AMC", "Grand Forks Air Force Base", ["grandforks",
-                                                                                                     "forks"])
+forks = Base("Grand Forks, North Dakota. United States.", "AMC", "Grand Forks Air Force Base", ["forks",
+                                                                                                     "grandforks"])
 hanscom = Base("Lincoln, Massachusetts. United States.", "AFMC", "Hanscom Air Force Base", ["hanscom"])
 hill = Base("Ogden, Utah. United States.", "AFMC", "Hill Air Force Base", ["hill"])
 holloman = Base("Alamogordo, New Mexico. United States.", "ACC", "Holloman Air Force Base", ["holloman"])
@@ -94,10 +93,10 @@ hurlburt = Base("Mary Esther, Florida. United States.", "AFSOC", "Hurlburt Field
 keesler = Base("Biloxi, Mississippi. United States.", "AETC", "Keesler Air Force Base", ["keesler"])
 kirtland = Base("Albuquerque, New Mexico. United States.", "AFMC", "Kirtland Air Force Base", ["kirtland"])
 laughlin = Base("Del Rio, Texas. United States.", "AETC", "Laughlin Air Force Base", ["laughlin"])
-littlerock = Base("Jacksonville, Arkansas. United States.", "AMC",
-                  "Little Rock Air Force Base", ["littlerock", "little rock"])
-losangeles = Base("El Segundo, California. United States.", "AFSPC", "Los Angeles Air Force Base", ["losangeles",
-                                                                                                    "angeles"])
+rock = Base("Jacksonville, Arkansas. United States.", "AMC",
+                  "Little Rock Air Force Base", ["rock", "littlerock"])
+losangeles = Base("El Segundo, California. United States.", "AFSPC", "Los Angeles Air Force Base", ["angeles",
+                                                                                                    "losangeles"])
 luke = Base("Glendale, Arizona. United States.", "AETC", "Luke Air Force Base", ["luke"])
 macdill = Base("Tampa, Florida. United States.", "AMC", "MacDill Air Force Base", ["macdill"])
 malmstrom = Base("Great Falls, Montana. United States.", "AFGSC", "Malmstrom Air Force Base", ["malmstrom"])
@@ -105,8 +104,8 @@ maxwell = Base("Montgomery, Alabama. United States.", "AETC", "Maxwell Air Force
 mcconnell = Base("Wichita, Kansas. United States.", "AMC", "McConnell Air Force Base", ["mcconnell"])
 minot = Base("Minot, North Dakota. United States.", "AFGSC", "Minot Air Force Base", ["minot", "whynotminot"])
 moody = Base("Valdosta, Georgia. United States.", "ACC", "Moody Air Force Base", ["moody"])
-mountainhome = Base("Mountain Home, Idaho. United States.", "ACC",
-                    "Mountain Home Air Force Base", ["mountainhome", "mountain"])
+mountain = Base("Mountain Home, Idaho. United States.", "ACC",
+                    "Mountain Home Air Force Base", ["mountain", "mountainhome"])
 nellis = Base("Las Vegas, Nevada. United States.", "ACC", "Nellis Air Force Base", ["nellis"])
 offutt = Base("Bellevue, Nebraska. United States.", "ACC", "Offutt Air Force Base", ["offutt"])
 patrick = Base("Palm Bay, Florida. United States.", "AFSPC", "Patrick Air Force Base", ["patrick"])
@@ -145,12 +144,14 @@ mcguire = Base("Trenton, New Jersey. United States.", None,
                 "JB McGuire-Dix-Lakehurst", ["mcguire", "mcguire-dix-lakehurst"])
 hickam = Base("Honolulu, Hawaii. United States.", "PACAF", "JB Pearl Harbor-Hickam", ["hickam"])
 lackland = Base("San Antonio, Texas. United States.", "AETC", "JB San Antonio", ["lackland", "jbsa", "randolph"])
-andersen = Base("Yigo, Guam.", None, "Joint Region Marianas (Andersen AFB)", ["andersen", "marianas"])
+andersen = Base("Yigo, Guam.", None, "Joint Region Marianas", ["andersen", "marianas"])
 cape = Base("Bourne, Massachusetts. United States.", "AFSPC", "Joint Base Cape Cod", ["cape", "cod"])
 
 
 
 # Foreign Countries
+
+soto = Base("Honduras.", None, "Soto Cano Air Base", ["soto"])
 
 # Europe / Africa
 thule = Base("Thule, Greenland.", "AFSPC", "Thule Air Base", ["thule"])
@@ -163,9 +164,9 @@ incirlik = Base("Adana, Turkey.", "USAFE-AFAFRICA", "Incirlik Air Base", ["incir
 izmir = Base("Izmir, Turkey.", "USAFE-AFAFRICA", "Izmir Air Station", ["izmir"])
 kleinebrogel = Base("Belgium.", "USAFE-AFAFRICA", "Kleine Brogel Air Base", ["kleine", "brogel"])
 lajes = Base("Lajes Acores, Portugal.", "USAFE-AFAFRICA", "Lajes Field", ["lajes"])
-moron = Base("Spain.", "USAFE-AFAFRICA", "Morón Air Base", ["morón", "moron"])
+moron = Base("Spain.", "USAFE-AFAFRICA", "Morón Air Base", ["moron", "morón"])
 geilenkirchen = Base("Germany.", "USAFE-AFAFRICA", "NATO Air Base Geilenkirchen", ["geilenkirchen"])
-papa = Base("Hungary.", "USAFE-AFAFRICA", "Pápa Air Base", ["pápa", "papa"])
+papa = Base("Hungary.", "USAFE-AFAFRICA", "Pápa Air Base", ["papa", "pápa"])
 alconbury = Base("Cambridgeshire, United Kingdom.", "USAFE-AFAFRICA", "RAF Alconbury", ["alconbury"])
 croughton = Base("Northamptonshire, United Kingdom.", "USAFE-AFAFRICA", "RAF Croughton", ["croughton"])
 fairford = Base("Gloucestershire, United Kingdom.", "USAFE-AFAFRICA", "RAF Fairford", ["fairford"])
@@ -181,7 +182,6 @@ spangdahlem = Base("Germany.", "USAFE-AFAFRICA", "Spangdahlem Air Base", ["spang
 stavanger = Base("Norway.", "USAFE-AFAFRICA", "Stavanger Air Station", ["stavanger"])
 volkel = Base("Netherlands.", "USAFE-AFAFRICA", "Volkel Air Base", ["volkel"])
 
-
 # Pacific
 eielson = Base("Fairbanks, Alaska. United States.", "PACAF", "Eielson Air Force Base", ["eielson"])
 kadena = Base("Okinawa, Japan.", "PACAF", "Kadena Air Base", ["kadena"])
@@ -194,7 +194,7 @@ yokota = Base("Tokyo, Japan.", "PACAF", "Yokota Air Base", ["yokota"])
 # AFCENT
 aldhafra = Base("United Arab Emirates.", "AFCENT", "Al Dhafra Air Base", ["dhafra", "adab"])
 aludeid = Base("Doha, Qatar.", "AFCENT", "Al Udeid Air Base", ["udeid", "deid", "auab"])
-alialsalem = Base("Kuwait.", "AFCENT", "Ali Al Salem Air Base", ["alsalem", "salem"])
+alialsalem = Base("Kuwait.", "AFCENT", "Ali Al Salem Air Base", ["salem", "alsalem"])
 bagram = Base("Bagram, Afghanistan.", "AFCENT", "Bagram Airfield", ["bagram"])
 kabul = Base("Kabul, Afghanistan.", "AFCENT", "Kabul International Airport", ["kabul"])
 kandahar = Base("Kandahar, Afghanistan.", "AFCENT", "Kandahar Airfield", ["kandahar", "khandahar"])
@@ -203,22 +203,24 @@ shindand = Base("Afghanistan.", "AFCENT", "Shindand Air Base", ["shindand"])
 thumrait = Base("Salalah, Dhofar, Oman.", "AFCENT", "RAFO Thumrait", ["thumrait"])  # Incorrect location intentional for weather
 
 # Army
-
+presidio = Base("Monterey, California. United States.", None, "Presidio of Monterey", ["presidio", "monterey"])
+redcloud = Base("Uijeongbu, South Korea.", None, "Camp Red Cloud", ["cloud"])
+yongsan = Base("Seoul, South Korea.", None, "Yongsan Garrison", ["yongsan"])
 zama = Base("Sagamihara, Japan.", None, "Camp Zama", ["zama"])
 
 # Have abstained from adding ANG bases due to a lack of mentions and to save time.
 
 all_bases = [altus, arnold, barksdale, beale, buckley, cape, cannon, cavalier, columbus, creech, davismonthan,
-             dover, dyess, edwards, eglin, elisworth, warren, fairchild, jackson, meade, goodfellow, grandforks,
-             hanscom, hill, holloman, hurlburt, keesler, kirtland, laughlin, littlerock, losangeles, luke,
-             macdill, malmstrom, maxwell, mcconnell, minot, moody, mountainhome, nellis, offutt, patrick,
+             dover, dyess, edwards, eglin, ellsworth, warren, fairchild, jackson, meade, goodfellow, forks,
+             hanscom, hill, holloman, hurlburt, keesler, kirtland, laughlin, rock, losangeles, luke,
+             macdill, malmstrom, maxwell, mcconnell, minot, moody, mountain, nellis, offutt, patrick,
              peterson, pope, robins, schriever, scott, seymourjohnson, shaw, sheppard, tinker, travis, tyndall,
              usafacademy, vance, vandenberg, whiteman, wrightpatterson, bolling, andrews, charleston, elmendorf,
-             langley, mcchord, mcguire, hickam, lackland, andersen, thule, ankara, aviano, buchel, chievres,
+             langley, mcchord, mcguire, hickam, lackland, andersen, soto, thule, ankara, aviano, buchel, chievres,
              ghedi, incirlik, izmir, kleinebrogel, lajes, moron, geilenkirchen, papa, alconbury, croughton, fairford,
              feltwell, flyingdales, lakenheath, menwith, mildenhall, molesworth, welford, ramstein, spangdahlem,
              stavanger, volkel, eielson, kadena, kunsan, misawa, osan, yokota, aldhafra, aludeid, alialsalem, bagram,
-             kabul, kandahar, sheikisa, shindand, shindand, thumrait, zama]
+             kabul, kandahar, sheikisa, shindand, shindand, thumrait, presidio, redcloud, yongsan, zama]
 
 
 def maketables():
