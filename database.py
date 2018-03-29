@@ -45,6 +45,13 @@ def data_entry(base, name, rtype, rating, commentid, threadid):
 
 
 def checkblacklisted(User, ID):
+    if User and ID:
+        c.execute(f"SELECT rowid FROM blacklist WHERE commentid = '{ID}' OR username = '{User}'")
+        existing = c.fetchall()
+        if len(existing) != 0:
+            if constants.debugsearch:
+                print("User or ID is blacklisted, ignoring.")
+            return True
     if not User:
         c.execute(f"SELECT rowid FROM blacklist WHERE commentid = '{ID}'")
         existing = c.fetchall()
@@ -81,7 +88,8 @@ def query_rating(base, rtype):
     ratingssum = float(ratings)
     if constants.debugsearch:
         pass
-    print(f"Querying rating of {base}, there are {userratings} ratings")
+    if constants.debugsearch:
+        print(f"Querying rating of {base}, there are {userratings} ratings")
     if userratings == 0:
         return 10
     else:

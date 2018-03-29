@@ -3,48 +3,41 @@ import database as db
 
 def getsearch(session, base):
     """Main function, returns proper format of links and sneak peak of a comment."""
-    threesubmissions, topcomment = getthree(session, base)
-    if not threesubmissions:
+    sublist = getsubs(session, base)
+    topcomments = gettopcomments(sublist)
+    url = "[Create your own discussion.](https://www.reddit.com/r/RateMyAFB/submit)"
+    if not sublist:
         return """I could not find a discussion in /r/RateMyAFB for this base, perhaps you could
-[start one?](https://www.reddit.com/r/RateMyAFB/submit?selftext=true)\n\n"""
-    reply = getreply(threesubmissions, topcomment)
+[start one?](https://www.reddit.com/r/RateMyAFB/submit?selftext=true)\n\n{url}\n\n"""
+    reply = getreply(sublist, topcomments)
     return reply
 
-
-def getthree(session, base):
-    """Gets the three most relevant submissions from ratemyafb, or as many as it can."""
+def getsubs(session, base):
     allsubmissions = []
     for submission in session.subreddit('ratemyafb').search(f"{base}"):
-        allsubmissions.append(submission)
-    if len(allsubmissions) >= 3:
-        threesubmissions = [allsubmissions[2], allsubmissions[1], allsubmissions[0]]
-        topcomment = gettopcomment(threesubmissions[0], threesubmissions[1], threesubmissions[2])
-    elif len(allsubmissions) == 2:
-        threesubmissions = [allsubmissions[1], allsubmissions[0]]
-        topcomment = gettopcomment(threesubmissions[0], threesubmissions[1], False)
-    elif len(allsubmissions) == 1:
-        threesubmissions = [allsubmissions[0]]
-        topcomment = gettopcomment(threesubmissions[0], False, False)
-    else:
-        return "", ""
-    return threesubmissions, topcomment
+        if not db.checkblacklisted(submission.author, submission.id):
+            allsubmissions.append(submission)
+    return allsubmissions
 
 
-def getreply(threesubmissions, topcomment):
+def getreply(sublist, topcomments):
     """Generates reply text"""
-    commentsneakpeak = sneakpeak(topcomment)
-    if len(threesubmissions) == 1:
-        sub1 = getformat(threesubmissions[0], True)
+    if len(topcomments) > 0:
+        commentsneakpeak = sneakpeak(topcomments[0], True)
     else:
-        sub1 = getformat(threesubmissions[0], False)
+        commentsneakpeak = ""
+    if len(sublist) == 1:
+        sub1 = getformat(sublist[0], True)
+    else:
+        sub1 = getformat(sublist[0], False)
     reply = f"""Have a question or wish to join in a discussion? Check out the below submission:\n\n
 {sub1}\n\n{commentsneakpeak}"""
-    if len(threesubmissions) >= 2:
-        sub2 = getformat(threesubmissions[1], False)
+    if len(sublist) >= 2:
+        sub2 = getformat(sublist[1], False)
         reply = f"""Have a question or wish to join in a discussion? Check out the below submissions:\n\n
 {sub1} | {sub2}\n\n{commentsneakpeak}"""
-    if len(threesubmissions) >= 3:
-        sub3 = getformat(threesubmissions[2], False)
+    if len(sublist) >= 3:
+        sub3 = getformat(sublist[2], False)
         reply = f"""Have a question or wish to join in a discussion? Check out the below submissions:\n\n
 {sub1} | {sub2} | {sub3}\n\n{commentsneakpeak}"""
 
@@ -67,53 +60,56 @@ def getformat(sub, single):
     return full
 
 
-def gettopcomment(sub1, sub2, sub3):
-    """Gets a list of comments and sorts by top, and checks if the comment is blacklisted"""
-    if db.checkblacklisted(False, sub1.id):
-        if sub2 and not db.checkblacklisted(False, sub2.id):
-            sub = sub2
-        elif sub3 and not db.checkblacklisted(False, sub3.id):
-            sub = sub3
-        else:
-            return ""
-    else:
-        sub = sub1
-    sub.comment_sort = 'top'
-    commentlist = sub.comments.list()
-    commentlist.sort(key=lambda comment: comment.score, reverse=True)
-    delete = []
-    for i in range(len(commentlist)):
-        if commentlist[i].body == "[deleted]":
-            delete.append(i)
-        elif db.checkblacklisted(False, commentlist[i].id):
-            delete.append(i)
-    if delete:
-        for index in sorted(delete, reverse=True):
-            del commentlist[index]
+def gettopcomments(sublist):
+    """Gets a list of comments and sorts by top, and checks if the comment is blacklisted.
+    Because of reddit's fuzzing of comment scores this is not 100% accurate resulting in
+    slightly different scores each time."""
+    topcomments = []
+    for sub in sublist:
+        sub.comment_sort = 'top'
+        sub.comments.replace_more(limit=None, threshold=0)
+        commentlist = sub.comments.list()
 
-    if len(commentlist) > 0:
-        return commentlist[0]
-    else:
-        return ""
+        commentlist.sort(key=lambda comment: comment.score, reverse=True)
+        delete = []
+        for i in range(len(commentlist)):
+            if commentlist[i].body == "[deleted]":
+                delete.append(i)
+            elif db.checkblacklisted(commentlist[i].author, commentlist[i].id):
+                delete.append(i)
+        if delete:
+            for index in sorted(delete, reverse=True):
+                del commentlist[index]
+
+        if len(commentlist) > 0:
+            topcomments.append(commentlist[0])
+        if len(commentlist) > 1:
+            topcomments.append(commentlist[1])
+    topcomments.sort(key=lambda comment: comment.score, reverse=True)
+    return topcomments
 
 
-def sneakpeak(comment):
+def sneakpeak(comment, shorten):
     """Generates a sneak peak of a comment if possible."""
     if comment == "":
         return ""
     else:
         listbody = list(comment.body)
-        if len(listbody) > 360:  # Kills comment after 4 line breaks.
-            breaks = 0
-            for i in range(len(listbody)):
-                if breaks > 4:
-                    del listbody[i:len(listbody)]
-                    break
-                if listbody[i] == '\n':
-                    breaks += 1
-        if len(listbody) > 1000:  # Prevents wall of text with no line breaks from getting through.
-            del listbody[1001:len(listbody)]
-        quoted = quotetext(listbody)
+        for i in range(len(listbody)):
+            if listbody[i] == '|':
+                listbody[i] = ' '
+        if shorten:
+            if len(listbody) > 360:  # Kills comment after 4 line breaks.
+                breaks = 0
+                for i in range(len(listbody)):
+                    if breaks > 4:
+                        del listbody[i:len(listbody)]
+                        break
+                    if listbody[i] == '\n':
+                        breaks += 1
+            if len(listbody) > 1000:  # Prevents wall of text with no line breaks from getting through.
+                del listbody[1001:len(listbody)]
+        quoted = quotetext(listbody, shorten)
         joinedbody = ''.join(quoted)
         final = f"""*Sneak peak of a top [comment](https://www.reddit.com/r/ratemyafb/comments/{comment.submission.id}//{comment.id})
 by [{comment.author}](https://www.reddit.com/user/{comment.author}):*
@@ -121,38 +117,111 @@ by [{comment.author}](https://www.reddit.com/user/{comment.author}):*
         return final
 
 
-def quotetext(listtext):
+def quotetext(listtext, notwiki):
     """Formats text to be quoted"""
     listtext.insert(0, '>')
     totalbreaks = 0
-    if listtext[len(listtext) - 1] == '\n':
+    while listtext[len(listtext) - 1] == '\n':
         del listtext[len(listtext) - 1]
     for i in range(len(listtext)):
         if listtext[i] == "\n" and listtext[i + 1] == "\n":
             totalbreaks += 1
-    if totalbreaks == 2:
-        break1 = 0
-        for i in range(len(listtext)):
-            if listtext[i] == "\n" and listtext[i + 1] == "\n":
-                break1 = i + 1
-                break
-        break2 = 0
-        for i in range(len(listtext) - 1, break1, -1):
-            if listtext[i] == "\n" and listtext[i - 1] == "\n":
-                break2 = i
-                break
-        listtext.insert(break1 + 1, '>')
-        listtext.insert(break2 + 2, '>')
-        return listtext
-    elif totalbreaks == 2:
-        for i in range(len(listtext)):
-            if listtext[i] == "\n" and listtext[i + 1] == "\n":
-                listtext.insert(i + 2, '>')
-                break
-        return listtext
-    elif totalbreaks == 0:
-        return listtext
+        if notwiki:
+            if totalbreaks == 2:
+                break1 = 0
+                for i in range(len(listtext)):
+                    if listtext[i] == "\n" and listtext[i + 1] == "\n":
+                        break1 = i + 1
+                        break
+                break2 = 0
+                for i in range(len(listtext) - 1, break1, -1):
+                    if listtext[i] == "\n" and listtext[i - 1] == "\n":
+                        break2 = i
+                        break
+                listtext.insert(break1 + 1, '>')
+                listtext.insert(break2 + 2, '>')
+                return listtext
+            elif totalbreaks == 2:
+                for i in range(len(listtext)):
+                    if listtext[i] == "\n" and listtext[i + 1] == "\n":
+                        listtext.insert(i + 2, '>')
+                        break
+                return listtext
+            elif totalbreaks == 0:
+                return listtext
+        else:
+            addquotespots = []
+            for i in range(len(listtext)):
+                if listtext[i] == "\n" and listtext[i + 1] == "\n":
+                    addquotespots.append(i + 1)
+                    continue
+                elif listtext[i] == "\n" and listtext[i - 1] != "\n":
+                    addquotespots.append(i + 1)
+            if addquotespots:
+                for index in sorted(addquotespots, reverse=True):
+                    listtext.insert(index, ">")
+            return listtext
 
     else:
         print("Something weird happened while getting comment quote: " + str(listtext))
         return ""
+
+ #  Wiki stuff ----------------
+
+
+def getwikisearch(session, base):
+    sublist = getsubs(session, base)
+    if not sublist:
+        return """There are no discussions in /r/RateMyAFB for this base, perhaps you could
+start one?\n\n"""
+    topclist = gettopcomments(sublist)
+    reply = getwikiformat(sublist, topclist)
+    return reply
+
+
+def getwikiformat(sublist, topclist):
+    url = "[Create your own discussion.](https://www.reddit.com/r/RateMyAFB/submit)"
+    sub1 = getsublistformat(sublist[0])
+    sub2, sub3, sub4, sub5 = "", "", "", ""
+    if len(sublist) > 1:
+        sub2 = getsublistformat(sublist[1])
+    if len(sublist) > 2:
+        sub3 = getsublistformat(sublist[2])
+    if len(sublist) > 3:
+        sub4 = getsublistformat(sublist[3])
+    if len(sublist) > 4:
+        sub5 = getsublistformat(sublist[4])
+    if not topclist:
+        topc1 = "No comments found."
+    else:
+        topc1 = sneakpeak(topclist[0], False)
+    topc2 = ""
+    topc3 = ""
+    if len(topclist) > 1:
+        topc2 = sneakpeak(topclist[1], False)
+    if len(topclist) > 2:
+        topc3 = sneakpeak(topclist[2], False)
+    format = f"""##Discussions\nStatus | Discussion\n- | -\n{sub1}{sub2}{sub3}{sub4}{sub5}
+\n{url}\n##Top Comments\n{topc1}{topc2}{topc3}"""
+    return format
+
+def getsublistformat(sub):
+    listtitle = list(sub.title)
+    for i in range(len(listtitle)):
+        if listtitle[i] == '|':
+            listtitle[i] = ' '
+            continue
+        elif listtitle[i] == '-':
+            listtitle[i] = ' '
+            continue
+        else:
+            continue
+    joinedtitle = ''.join(listtitle)
+    url = f"[{joinedtitle}](https://www.reddit.com/r/RateMyAFB/comments/{sub.id})"
+    status = sub.archived
+    if status:
+        status = "Archived"
+    else:
+        status = "Open"
+    final = f"""{status} | {url}\n"""
+    return final
