@@ -7,7 +7,7 @@ def getsearch(session, base):
     topcomments = gettopcomments(sublist)
     url = "[Create your own discussion.](https://www.reddit.com/r/RateMyAFB/submit)"
     if not sublist:
-        return """I could not find a discussion in /r/RateMyAFB for this base, perhaps you could
+        return f"""I could not find a discussion in /r/RateMyAFB for this base, perhaps you could
 [start one?](https://www.reddit.com/r/RateMyAFB/submit?selftext=true)\n\n{url}\n\n"""
     reply = getreply(sublist, topcomments)
     return reply
@@ -170,10 +170,11 @@ def quotetext(listtext, notwiki):
 
 
 def getwikisearch(session, base):
+    url = "[Create your own discussion.](https://www.reddit.com/r/RateMyAFB/submit)"
     sublist = getsubs(session, base)
     if not sublist:
-        return """There are no discussions in /r/RateMyAFB for this base, perhaps you could
-start one?\n\n"""
+        return f"""##Discussions\nThere are no discussions in /r/RateMyAFB for this base, perhaps you could
+start one?\n\n{url}\n\n"""
     topclist = gettopcomments(sublist)
     reply = getwikiformat(sublist, topclist)
     return reply
@@ -201,7 +202,7 @@ def getwikiformat(sublist, topclist):
         topc2 = sneakpeak(topclist[1], False)
     if len(topclist) > 2:
         topc3 = sneakpeak(topclist[2], False)
-    format = f"""##Discussions\nStatus | Discussion\n- | -\n{sub1}{sub2}{sub3}{sub4}{sub5}
+    format = f"""##Discussions\nStatus | Discussion Title\n- | -\n{sub1}{sub2}{sub3}{sub4}{sub5}
 \n{url}\n##Top Comments\n{topc1}{topc2}{topc3}"""
     return format
 

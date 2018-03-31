@@ -282,7 +282,7 @@ def getratingnumber(text, rtype):
 def reply(comment, base, session):
     """Replies to a comment with the base rating."""
     wikiurl = f"""For more information check out the [base wiki]
-    (https://www.reddit.com/r/afbbot/wiki/bases/{base.names[0]})\n\n"""
+    (https://www.reddit.com/r/ratemyafb/wiki/bases/{base.names[0]})\n\n"""
     print("Adding reply to " + str(comment.id))
     if not c.debugnoreply:
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
@@ -305,7 +305,7 @@ def statsreply(comment, threadid):
 def rated_reply(comment, base, rtypes, rating, update):
     """Acknowledges a base rating and replies with the updated rating"""
     wikiurl = f"""For more information check out the [base wiki]
-(https://www.reddit.com/r/afbbot/wiki/bases/{base.names[0]})\n\n"""
+(https://www.reddit.com/r/ratemyafb/wiki/bases/{base.names[0]})\n\n"""
     singlechange = False
     if len(rtypes) == 1:
         singlechange = True
@@ -447,9 +447,9 @@ if __name__ == "__main__":
 
     while True:  # Main loop
         session = reddit_login()
+        bot_main(session)
         if c.updatewiki:
             try:
                 wiki.maintainer.update(session)
             except wikipedia.exceptions.WikipediaException as e:
                 print("Wiki error: " + str(e))
-        bot_main(session)
