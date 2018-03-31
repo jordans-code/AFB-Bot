@@ -59,28 +59,35 @@ maintainer = Wiki()
 def checkforpage(session, base):
     """Checks if a wiki page exists"""
     try:
-        wikipage = session.subreddit('afbbot').wiki[f'bases/{base.names[0]}']
+        wikipage = session.subreddit('ratemyafb').wiki[f'bases/{base.names[0]}']
         useless = wikipage.content_md
     except prawcore.exceptions.NotFound:
-        print("Creating page")
+        print("Creating wiki page for: " + str(base.names[0]))
         createpage(session, base)
         return False
     except prawcore.exceptions.BadRequest as e:
         print("400 response: " + str(e))
         print(str(base.names[0]) + str(session))
+    except prawcore.exceptions.RequestException as e:
+        print("Reddit timed out, sleeping and retrying. " + str(e))
+    except Exception as e:
+        print(str(e))
     else:
         return useless
 
 
 def createpage(session, base):
-    session.subreddit('afbbot').wiki.create(f"bases/{base.names[0]}", f"{genpage(session, base)}",
-                                            reason="Bleep Bloop, initial page creation.")
-    if c.debugwiki:
-        print("Created wiki page for " + str(base.names[0]))
+    try:
+        session.subreddit('ratemyafb').wiki.create(f"bases/{base.names[0]}", f"{genpage(session, base)}",
+reason="""Bleep Bloop, initial page creation.""")
+        if c.debugwiki:
+            print("Created wiki page for " + str(base.names[0]))
+    except Exception as e:
+        print("Bot may not have permisson to create a new wiki page." + str(e))
 
 
 def updatepage(session, content, base):
-    page = session.subreddit('afbbot').wiki[f'bases/{base.names[0]}']
+    page = session.subreddit('ratemyafb').wiki[f'bases/{base.names[0]}']
     page.edit(content, reason="Bleep Bloop, updating the page.")
     if c.debugwiki:
         print("Updated page!")
@@ -102,12 +109,18 @@ def genpage(session, base):
 
 def getwiki(base):
     """Gets actual Wikipedia article summary"""
-    summary = wikipedia.summary(f"{base.displayname}")
-    return summary
+    try:
+        summary = wikipedia.summary(f"{base.displayname}")
+    except Exception as e:
+        print("Wiki too busy, sleeping. " + str(e))
+        time.sleep(10)
+    else:
+        return summary
 
 
 def getratings(base):
     """Generates all ratings and places in format for wiki"""
+    url = f"""*Want to add a rating?* [Check out the bot usage page.](https://www.reddit.com/r/AFBbot/wiki/about)"""
     overall = str(base.gettrueoverallrating())
     overalltotal = str(bases.db.count_ratings(base.names[0], False))
     general = str(base.getrating("rate"))
@@ -120,7 +133,7 @@ def getratings(base):
 **Overall Rating** | {overall}/10 | {overalltotal}
 General Rating | {general}/10 | {generaltotal}
 Local Area Rating | {area}/10 | {areatotal}
-Housing Rating | {housing}/10 | {housingtotal}\n\n"""
+Housing Rating | {housing}/10 | {housingtotal}\n\n{url}\n\n"""
     return final
 
 
