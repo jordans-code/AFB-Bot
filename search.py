@@ -109,7 +109,7 @@ def sneakpeak(comment, shorten):
                         breaks += 1
             if len(listbody) > 1000:  # Prevents wall of text with no line breaks from getting through.
                 del listbody[1001:len(listbody)]
-        quoted = quotetext(listbody, shorten)
+        quoted = quotetext(listbody)
         joinedbody = ''.join(quoted)
         final = f"""*Sneak peak of a top [comment](https://www.reddit.com/r/ratemyafb/comments/{comment.submission.id}//{comment.id})
 by [{comment.author}](https://www.reddit.com/user/{comment.author}):*
@@ -117,54 +117,24 @@ by [{comment.author}](https://www.reddit.com/user/{comment.author}):*
         return final
 
 
-def quotetext(listtext, notwiki):
+def quotetext(listtext):
     """Formats text to be quoted"""
     listtext.insert(0, '>')
-    totalbreaks = 0
     while listtext[len(listtext) - 1] == '\n':
         del listtext[len(listtext) - 1]
+
+    addquotespots = []
     for i in range(len(listtext)):
         if listtext[i] == "\n" and listtext[i + 1] == "\n":
-            totalbreaks += 1
-        if notwiki:
-            if totalbreaks == 2:
-                break1 = 0
-                for i in range(len(listtext)):
-                    if listtext[i] == "\n" and listtext[i + 1] == "\n":
-                        break1 = i + 1
-                        break
-                break2 = 0
-                for i in range(len(listtext) - 1, break1, -1):
-                    if listtext[i] == "\n" and listtext[i - 1] == "\n":
-                        break2 = i
-                        break
-                listtext.insert(break1 + 1, '>')
-                listtext.insert(break2 + 2, '>')
-                return listtext
-            elif totalbreaks == 2:
-                for i in range(len(listtext)):
-                    if listtext[i] == "\n" and listtext[i + 1] == "\n":
-                        listtext.insert(i + 2, '>')
-                        break
-                return listtext
-            elif totalbreaks == 0:
-                return listtext
-        else:
-            addquotespots = []
-            for i in range(len(listtext)):
-                if listtext[i] == "\n" and listtext[i + 1] == "\n":
-                    addquotespots.append(i + 1)
-                    continue
-                elif listtext[i] == "\n" and listtext[i - 1] != "\n":
-                    addquotespots.append(i + 1)
-            if addquotespots:
-                for index in sorted(addquotespots, reverse=True):
-                    listtext.insert(index, ">")
-            return listtext
+            addquotespots.append(i + 1)
+            continue
+        elif listtext[i] == "\n" and listtext[i - 1] != "\n":
+            addquotespots.append(i + 1)
+    if addquotespots:
+        for index in sorted(addquotespots, reverse=True):
+            listtext.insert(index, ">")
+    return listtext
 
-    else:
-        print("Something weird happened while getting comment quote: " + str(listtext))
-        return ""
 
  #  Wiki stuff ----------------
 
