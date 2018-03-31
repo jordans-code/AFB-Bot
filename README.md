@@ -15,7 +15,7 @@
 
 - To rate a base simply include the bot's name (**afbbot**), one or more of the following words: "**rate**"/"**arearate**"/"**housingrate**", a **number** (can be anything but will be rounded between 1-10) after each rating word, and the **base name**. The only thing that matters is that the rating number comes after the rating word.
 
->I was at **langley** for 2 years and the housing is great! Overall I **rate** it a **8**, and I arearate it **9.5** **AFBbot**.
+>I was at **langley** for 2 years and the housing is great! Overall I **rate** it an **8**, and I arearate it **9.5** **AFBbot**.
 
 - To summon the bot for overall statistics, simply include the bot's name (**afbbot**) and "**stats**".
 
