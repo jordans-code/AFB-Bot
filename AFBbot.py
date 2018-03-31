@@ -281,8 +281,8 @@ def getratingnumber(text, rtype):
 
 def reply(comment, base, session):
     """Replies to a comment with the base rating."""
-    wikiurl = f"""For more information check out the [base wiki]
-    (https://www.reddit.com/r/ratemyafb/wiki/bases/{base.names[0]})\n\n"""
+    wikiurl = f"""*For more information check out the [base wiki.]
+    (https://www.reddit.com/r/ratemyafb/wiki/bases/{base.names[0]})*\n\n"""
     print("Adding reply to " + str(comment.id))
     if not c.debugnoreply:
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
