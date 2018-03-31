@@ -81,7 +81,7 @@ ellsworth = Base("Box Elder, South Dakota. United States.", "AFGSC", "Ellsworth 
 warren = Base("Cheyenne, Wyoming. United States.", "AFGSC",
               "Francis E. Warren Air Force Base", ["warren", "francis-warren"])
 fairchild = Base("Airway Heights, Washington. United States.", "AMC", "Fairchild Air Force Base", ["fairchild"])
-jackson = Base("Columbia, South Carolina. United States.", None, "Fort Jackson", ["jackson"])
+jackson = Base("Columbia, South Carolina. United States.", None, "Fort Jackson (South Carolina)", ["jackson"])
 meade = Base("Odenton, Maryland. United States.", None, "Fort George G. Meade", ["meade"])
 goodfellow = Base("San Angelo, Texas. United States.", "AETC", "Goodfellow Air Force Base", ["goodfellow"])
 forks = Base("Grand Forks, North Dakota. United States.", "AMC", "Grand Forks Air Force Base", ["forks",
@@ -171,7 +171,6 @@ alconbury = Base("Cambridgeshire, United Kingdom.", "USAFE-AFAFRICA", "RAF Alcon
 croughton = Base("Northamptonshire, United Kingdom.", "USAFE-AFAFRICA", "RAF Croughton", ["croughton"])
 fairford = Base("Gloucestershire, United Kingdom.", "USAFE-AFAFRICA", "RAF Fairford", ["fairford"])
 feltwell = Base("Norfolk, United Kingdom.", "USAFE-AFAFRICA", "RAF Feltwell", ["feltwell"])
-flyingdales = Base("North Yorkshire, United Kingdom.", "USAFE-AFAFRICA", "RAF Flyingdales", ["flyingdales"])
 lakenheath = Base("Suffolk, United Kingdom.", "USAFE-AFAFRICA", "RAF Lakenheath", ["lakenheath"])
 menwith = Base("North Yorkshire, United Kingdom.", "USAFE-AFAFRICA", "RAF Menwith Hill", ["menwith"])
 mildenhall = Base("Suffolk, United Kingdom.", "USAFE-AFAFRICA", "RAF Mildenhall", ["mildenhall"])
@@ -218,7 +217,7 @@ all_bases = [altus, arnold, barksdale, beale, buckley, cape, cannon, cavalier, c
              usafacademy, vance, vandenberg, whiteman, wrightpatterson, bolling, andrews, charleston, elmendorf,
              langley, mcchord, mcguire, hickam, lackland, andersen, soto, thule, ankara, aviano, buchel, chievres,
              ghedi, incirlik, izmir, kleinebrogel, lajes, moron, geilenkirchen, papa, alconbury, croughton, fairford,
-             feltwell, flyingdales, lakenheath, menwith, mildenhall, molesworth, welford, ramstein, spangdahlem,
+             feltwell, lakenheath, menwith, mildenhall, molesworth, welford, ramstein, spangdahlem,
              stavanger, volkel, eielson, kadena, kunsan, misawa, osan, yokota, aldhafra, aludeid, alialsalem, bagram,
              kabul, kandahar, sheikisa, shindand, shindand, thumrait, presidio, redcloud, yongsan, zama]
 
