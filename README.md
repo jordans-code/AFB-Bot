@@ -8,6 +8,8 @@
 
 * Ability to summon the bot for overall statistics. The bot will provide the highest and lowest rated bases along with the current coldest and warmest temperature bases. 
 
+* Maintains a dynamic wiki for all of the bases.
+
 **Usage:**
 
 - To summon the bot for base information, simply include the bot's name (**afbbot**) and a base name, ex: **Langley**. The base name triggers are keywords and nicknames. If you have any suggestions for additional bases or nicknames please let me know.
@@ -43,10 +45,12 @@
 
 - The bot does not care about fractions, ex: if you say "I rate langley 5/5" it will rate it 10 (55 rounded down).  It just looks for the first number after the word rate along with spaces.
 
-- The bot currently only runs on /r/AFBbot (feel free to test things here) and /r/RateMyAFB
+- The bot currently runs on /r/AFBbot (feel free to test things here) and /r/RateMyAFB
 
 >The bot will ignore single lines of quoted text and attempt to function as normal with the rest of the comment/thread.
 >However, if there are multiple lines of quoted text such as this the bot will NOT reply.
+
+- The bot maintains a wiki on /r/RateMyAFB for all bases. The bot loops through each base page to check for an update roughly every 15 minutes. Sometimes the bot will cycle top comments when the scores are similar, this is due to reddit's anti upvote bot fuzzing which randomly changes the scores.
 
 Huge thanks to /u/Rate_My_AF_Base for letting me trial the bot.
 

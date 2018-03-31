@@ -7,7 +7,8 @@ import time
 import bases
 import stats
 import search
-
+import wiki
+import wikipedia
 
 def reddit_login():
     """Creates instance of Reddit login."""
@@ -280,6 +281,8 @@ def getratingnumber(text, rtype):
 
 def reply(comment, base, session):
     """Replies to a comment with the base rating."""
+    wikiurl = f"""For more information check out the [base wiki]
+    (https://www.reddit.com/r/ratemyafb/wiki/bases/{base.names[0]})\n\n"""
     print("Adding reply to " + str(comment.id))
     if not c.debugnoreply:
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
@@ -288,7 +291,7 @@ def reply(comment, base, session):
 Overall base rating: {str(base.gettrueoverallrating())}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings.\n\n
 General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. | Area rating: 
 {str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. | Housing rating: 
-{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n"""
+{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n{wikiurl}"""
                       + c.bot_signature)
 
 
@@ -301,6 +304,8 @@ def statsreply(comment, threadid):
 
 def rated_reply(comment, base, rtypes, rating, update):
     """Acknowledges a base rating and replies with the updated rating"""
+    wikiurl = f"""For more information check out the [base wiki]
+(https://www.reddit.com/r/ratemyafb/wiki/bases/{base.names[0]})\n\n"""
     singlechange = False
     if len(rtypes) == 1:
         singlechange = True
@@ -320,7 +325,8 @@ def rated_reply(comment, base, rtypes, rating, update):
 Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings.\n\n
 General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. | Area rating: 
 {str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. | Housing rating: 
-{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n'''
+{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n
+{wikiurl}'''
 + c.bot_signature)
         else:
             if not c.debugnoreply:
@@ -328,7 +334,7 @@ General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(b
 Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings.\n\n
 General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. | Area rating: 
 {str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. | Housing rating: 
-{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n'''
+{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n{wikiurl}'''
 + c.bot_signature)
     else:
         if not c.debugnoreply:
@@ -336,10 +342,8 @@ General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(b
 Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings.\n\n
 General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. | Area rating: 
 {str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. | Housing rating: 
-{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n'''
+{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.{wikiurl}\n\n'''
 + c.bot_signature)
-
-
 
 
 def bot_main(login):
@@ -442,4 +446,10 @@ if __name__ == "__main__":
         bases.maketables()
 
     while True:  # Main loop
-        bot_main(reddit_login())
+        session = reddit_login()
+        bot_main(session)
+        if c.updatewiki:
+            try:
+                wiki.maintainer.update(session)
+            except wikipedia.exceptions.WikipediaException as e:
+                print("Wiki error: " + str(e))
