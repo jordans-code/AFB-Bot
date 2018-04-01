@@ -5,6 +5,7 @@ import constants as c
 import prawcore
 import time
 
+
 class Wiki(object):
     def __init__(self):
         self.currentsession = None
@@ -38,7 +39,6 @@ class Wiki(object):
                     print("Checking if i need to update the page for " + str(values[i][0].names[0]))
                 self.checkforupdate(values[i][0], page)
 
-
     def checkforupdate(self, base, old):
         current = genpage(self.currentsession, base)
         if old == current:
@@ -52,6 +52,7 @@ class Wiki(object):
                 print("Not matching!")
             updatepage(self.currentsession, current, base)
             return False
+
 
 maintainer = Wiki()
 
@@ -77,6 +78,7 @@ def checkforpage(session, base):
 
 
 def createpage(session, base):
+    """Creates a wiki page"""
     try:
         session.subreddit('ratemyafb').wiki.create(f"bases/{base.names[0]}", f"{genpage(session, base)}",
 reason="""Bleep Bloop, initial page creation.""")
@@ -122,18 +124,32 @@ def getratings(base):
     """Generates all ratings and places in format for wiki"""
     url = f"""*Want to add a rating?* [Check out the bot usage page.](https://www.reddit.com/r/AFBbot/wiki/about)"""
     overall = str(base.gettrueoverallrating())
-    overalltotal = str(bases.db.count_ratings(base.names[0], False))
     general = str(base.getrating("rate"))
-    generaltotal = str(bases.db.count_ratings(base.names[0], "rate"))
     area = str(base.getrating("arearate"))
-    areatotal = str(bases.db.count_ratings(base.names[0], "arearate"))
-    housing = str(base.getrating("housingrate"))
-    housingtotal = str(bases.db.count_ratings(base.names[0], "housingrate"))
-    final = f"""##Ratings\nCategory | Rating | Total Ratings\n- | - | -
-**Overall Rating** | {overall}/10 | {overalltotal}
-General Rating | {general}/10 | {generaltotal}
-Local Area Rating | {area}/10 | {areatotal}
-Housing Rating | {housing}/10 | {housingtotal}\n\n{url}\n\n"""
+    onbase = str(base.getrating("onbaserate"))
+    offbase = str(base.getrating("offbaserate"))
+
+    overallranking, overallcount = base.getoverallranking()
+    generalranking, generalcount = base.getranking("rate")
+    arearanking, areacount = base.getranking("arearate")
+    onbaseranking, onbasecount = base.getranking("onbaserate")
+    offbaseranking, offbasecount = base.getranking("offbaserate")
+    if generalranking != "Unranked":
+        generalranking = f"#{generalranking}"
+    if arearanking != "Unranked":
+        arearanking = f"#{arearanking}"
+    if onbaseranking != "Unranked":
+        onbaseranking = f"#{onbaseranking}"
+    if offbaseranking != "Unranked":
+        offbaseranking = f"#{offbaseranking}"
+    final = f"""##Ratings\nCategories | Ratings | Rankings\n- | - | -
+**Overall Rating** | **{overall} /10** | {overallranking} **/{overallcount} bases**
+General Rating | {general} /10 | {generalranking} /{generalcount} bases
+Local Area Rating | {area} /10 | {arearanking} /{areacount} bases
+On-base Housing Rating | {onbase} /10 | {onbaseranking} /{onbasecount} bases
+Off-base Housing Rating | {offbase} /10 | {offbaseranking} /{offbasecount} bases
+\n\n{url}\n\n"""
     return final
+
 
 

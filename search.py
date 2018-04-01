@@ -12,7 +12,9 @@ def getsearch(session, base):
     reply = getreply(sublist, topcomments)
     return reply
 
+
 def getsubs(session, base):
+    """Gets a list of discussions in ratemyafb"""
     allsubmissions = []
     for submission in session.subreddit('ratemyafb').search(f"{base}"):
         if not db.checkblacklisted(submission.author, submission.id):
@@ -90,7 +92,7 @@ def gettopcomments(sublist):
 
 
 def sneakpeak(comment, shorten):
-    """Generates a sneak peak of a comment if possible."""
+    """Shortens a comment if requested and formats it."""
     if comment == "":
         return ""
     else:
@@ -118,7 +120,7 @@ by [{comment.author}](https://www.reddit.com/user/{comment.author}):*
 
 
 def quotetext(listtext):
-    """Formats text to be quoted"""
+    """Formats comment to be quoted"""
     listtext.insert(0, '>')
     while listtext[len(listtext) - 1] == '\n':
         del listtext[len(listtext) - 1]
@@ -135,11 +137,10 @@ def quotetext(listtext):
             listtext.insert(index, ">")
     return listtext
 
-
- #  Wiki stuff ----------------
-
+#  Wiki functions below ----------------
 
 def getwikisearch(session, base):
+    """Main function for returning discussions and top comments in wiki format"""
     url = "[Create your own discussion.](https://www.reddit.com/r/RateMyAFB/submit)"
     sublist = getsubs(session, base)
     if not sublist:
@@ -151,6 +152,7 @@ start one?\n\n{url}\n\n"""
 
 
 def getwikiformat(sublist, topclist):
+    """Formats the discussions and top comments for wiki from the lists"""
     url = "[Create your own discussion.](https://www.reddit.com/r/RateMyAFB/submit)"
     sub1 = getsublistformat(sublist[0])
     sub2, sub3, sub4, sub5 = "", "", "", ""
@@ -176,7 +178,9 @@ def getwikiformat(sublist, topclist):
 \n{url}\n##Top Comments\n{topc1}{topc2}{topc3}"""
     return format
 
+
 def getsublistformat(sub):
+    """Formats the title name for the wiki"""
     listtitle = list(sub.title)
     for i in range(len(listtitle)):
         if listtitle[i] == '|':

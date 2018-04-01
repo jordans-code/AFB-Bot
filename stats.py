@@ -75,6 +75,7 @@ Current lowest base temperature: {self.coldest.displayname}. {weather.getweather
 
         tenratings = {}
         if highestvalue == 10.0:
+            """If the top rating is a 10 it then sorts by the 10 ratings with the most ratings."""
             for key, value in orderedratings:
                 if value == 10.0:
                     tenratings[key] = int(bases.db.count_ratings(key, False))

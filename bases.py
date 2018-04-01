@@ -17,16 +17,37 @@ class Base(object):
 
     def getrating(self, rtype):
         overallrating = db.query_rating(self.names[0], rtype)
-        roundedrating = "%.2f" % overallrating
-        return roundedrating
+        if overallrating < 1:
+            return "Un-rated"
+        else:
+            roundedrating = "%.2f" % overallrating
+            return roundedrating
 
     def gettrueoverallrating(self):
         truerating = db.query_overallrating(self.names[0])
-        roundedrating = "%.2f" % truerating
-        return roundedrating
+        if truerating:
+            roundedrating = "%.2f" % truerating
+            return roundedrating
+        else:
+            return "Un-rated"
 
     def changerating(self, author, rtype, rating, commentid, threadid):
         db.change_entry(self.names[0], author, rtype, rating, commentid, threadid)
+
+    def getranking(self, rtype):
+        ranking, count = db.query_ranking(self, rtype, all_bases)
+        if ranking:
+            return ranking, count
+        else:
+            return "Un-ranked", count
+
+    def getoverallranking(self):
+        ranking, count = db.query_overallranking(self, all_bases)
+        if ranking:
+            ranking = f"**#{ranking}**"
+            return ranking, count
+        else:
+            return "Un-ranked", count
 
     def getmajcom(self):
         if self.majcom is not None:

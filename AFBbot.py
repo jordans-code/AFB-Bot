@@ -54,7 +54,7 @@ def checkbases(comment, session):
 
 
 def checkforrating(post, checktext, stringtext, issubmission):
-    ratingtypes = ["rate", "arearate", "housingrate"]
+    ratingtypes = ["rate", "arearate", "offbaserate", "onbaserate"]
     israting = False
     truebase = None
     rtypes = []
@@ -219,7 +219,7 @@ def checkvalidrating(comment, rtype):
 def getratingnumber(text, rtype):
     """Determines the rating of a base.
 
-    Detects the usage of 'rate' in a string,
+    Detects the usage of a rating type in a string,
     determines the base and rating, and returns a rating.
     """
     delete = []  # deletes everything up to and including the indexes "rate"
@@ -284,15 +284,19 @@ def reply(comment, base, session):
     wikiurl = f"""*For more information check out the [base wiki.]
     (https://www.reddit.com/r/ratemyafb/wiki/bases/{base.names[0]})*\n\n"""
     print("Adding reply to " + str(comment.id))
+    overallrating = str(base.gettrueoverallrating())
+    ranking, rankingcount = base.getoverallranking()
     if not c.debugnoreply:
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
 {stats.weather.getweather(base.location)}
 {search.getsearch(session, base.names[0])}
-Overall base rating: {str(base.gettrueoverallrating())}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings.\n\n
-General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. | Area rating: 
-{str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. | Housing rating: 
-{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n{wikiurl}"""
-                      + c.bot_signature)
+Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings. 
+Ranking: {ranking}^^/{rankingcount}\n\n
+General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. 
+| Area rating: {str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. 
+| On-base housing rating: {str(base.getrating("onbaserate"))} from {str(bases.db.count_ratings(base.names[0], "onbaserate"))} ratings. 
+| Off-base housing rating: {str(base.getrating("offbaserate"))} from {str(bases.db.count_ratings(base.names[0], "offbaserate"))} ratings.
+\n\n{wikiurl}""" + c.bot_signature)
 
 
 def statsreply(comment, threadid):
@@ -313,37 +317,45 @@ def rated_reply(comment, base, rtypes, rating, update):
             ratingtdisplay = "general rating"
         elif rtypes[0] == "arearate":
             ratingtdisplay = "area rating"
-        else:
-            ratingtdisplay = "housing rating"
-    overallrating = str(base.gettrueoverallrating())
+        elif rtypes[0] == "offbaserate":
+            ratingtdisplay = "off-base housing rating"
+        elif rtypes[0] == "onbaserate":
+            ratingtdisplay = "on-base housing rating"
 
+    overallrating = str(base.gettrueoverallrating())
+    ranking, rankingcount = base.getoverallranking()
     print(f"Adding {rtypes} to " + str(base.names[0]) + "  " + str(comment.id))  # Checks if they have already added a rating to this base
     if singlechange:
         if not update:
             if not c.debugnoreply:
                 comment.reply(f'''Your {ratingtdisplay} of {str(rating)} has been added to {base.displayname}.\n\n
-Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings.\n\n
-General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. | Area rating: 
-{str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. | Housing rating: 
-{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n
-{wikiurl}'''
-+ c.bot_signature)
+Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings. 
+Ranking: {ranking}^^/{rankingcount}\n\n
+General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. 
+| Area rating: {str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. 
+| On-base housing rating: {str(base.getrating("onbaserate"))} from {str(bases.db.count_ratings(base.names[0], "onbaserate"))} ratings. 
+| Off-base housing rating: {str(base.getrating("offbaserate"))} from {str(bases.db.count_ratings(base.names[0], "offbaserate"))} ratings.
+\n\n{wikiurl}''' + c.bot_signature)
         else:
             if not c.debugnoreply:
                 comment.reply(f'''Your {ratingtdisplay} of {base.displayname} has been changed to {str(rating)}.  
-Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings.\n\n
-General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. | Area rating: 
-{str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. | Housing rating: 
-{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.\n\n{wikiurl}'''
-+ c.bot_signature)
+Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings. 
+Ranking: {ranking}^^/{rankingcount}\n\n
+General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. 
+| Area rating: {str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. 
+| On-base housing rating: {str(base.getrating("onbaserate"))} from {str(bases.db.count_ratings(base.names[0], "onbaserate"))} ratings. 
+| Off-base housing rating: {str(base.getrating("offbaserate"))} from {str(bases.db.count_ratings(base.names[0], "offbaserate"))} ratings.
+\n\n{wikiurl}''' + c.bot_signature)
     else:
         if not c.debugnoreply:
             comment.reply(f'''Your ratings of {base.displayname} have been recieved.\n\n
-Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings.\n\n
-General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. | Area rating: 
-{str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. | Housing rating: 
-{str(base.getrating("housingrate"))} from {str(bases.db.count_ratings(base.names[0], "housingrate"))} ratings.{wikiurl}\n\n'''
-+ c.bot_signature)
+Overall base rating: {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings. 
+Ranking: {ranking}^^/{rankingcount}\n\n
+General rating: {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. 
+| Area rating: {str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings. 
+| On-base housing rating: {str(base.getrating("onbaserate"))} from {str(bases.db.count_ratings(base.names[0], "onbaserate"))} ratings. 
+| Off-base housing rating: {str(base.getrating("offbaserate"))} from {str(bases.db.count_ratings(base.names[0], "offbaserate"))} ratings.
+\n\n{wikiurl}''' + c.bot_signature)
 
 
 def bot_main(login):
