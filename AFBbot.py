@@ -282,7 +282,7 @@ def getratingnumber(text, rtype):
 
 def reply(comment, base, session):
     """Replies to a comment with the base rating."""
-    wikiurl = f"""*For more information check out the [base wiki.]
+    wikiurl = f"""*For more information check out the [Base Wiki.]
     (https://www.reddit.com/r/ratemyafb/wiki/bases/{base.names[0]})*\n\n"""
     print("Adding reply to " + str(comment.id))
     overallrating = str(base.gettrueoverallrating())
@@ -291,12 +291,8 @@ def reply(comment, base, session):
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
 {stats.weather.getweather(base.location)}
 {search.getsearch(session, base.names[0])}
-**Overall base rating:** {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings. 
+**Overall base rating:** {overallrating}/10 from {str(bases.db.count_ratings(base.names[0], False))} ratings. 
 | **Ranking:** {ranking} out of {rankingcount} bases.\n\n
-**General rating:** {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. 
-| **Local Area rating:** {str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings.\n\n
-**On-base housing rating:** {str(base.getrating("onbaserate"))} from {str(bases.db.count_ratings(base.names[0], "onbaserate"))} ratings. 
-| **Off-base housing rating:** {str(base.getrating("offbaserate"))} from {str(bases.db.count_ratings(base.names[0], "offbaserate"))} ratings.
 \n\n{wikiurl}""" + c.bot_signature)
 
 
@@ -309,8 +305,8 @@ def statsreply(comment, threadid):
 
 def rated_reply(comment, base, rtypes, rating, update):
     """Acknowledges a base rating and replies with the updated rating"""
-    wikiurl = f"""For more information check out the [base wiki.]
-(https://www.reddit.com/r/ratemyafb/wiki/bases/{base.names[0]})\n\n"""
+    wikiurl = f"""*For more information check out the [Base Wiki.]
+(https://www.reddit.com/r/ratemyafb/wiki/bases/{base.names[0]})*\n\n"""
     singlechange = False
     if len(rtypes) == 1:
         singlechange = True
@@ -330,7 +326,7 @@ def rated_reply(comment, base, rtypes, rating, update):
         if not update:
             if not c.debugnoreply:
                 comment.reply(f'''Your {ratingtdisplay} of {str(rating)} has been added to {base.displayname}.\n\n
-**Overall base rating:** {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings. 
+**Overall base rating:** {overallrating}/10 from {str(bases.db.count_ratings(base.names[0], False))} ratings. 
 | **Ranking:** {ranking} out of {rankingcount} bases.\n\n
 **General rating:** {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. 
 | **Local Area rating:** {str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings.\n\n
@@ -340,7 +336,7 @@ def rated_reply(comment, base, rtypes, rating, update):
         else:
             if not c.debugnoreply:
                 comment.reply(f'''Your {ratingtdisplay} of {base.displayname} has been changed to {str(rating)}.  
-**Overall base rating:** {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings. 
+**Overall base rating:** {overallrating}/10 from {str(bases.db.count_ratings(base.names[0], False))} ratings. 
 | **Ranking:** {ranking} out of {rankingcount} bases.\n\n
 **General rating:** {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. 
 | **Local Area rating:** {str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings.\n\n
@@ -350,7 +346,7 @@ def rated_reply(comment, base, rtypes, rating, update):
     else:
         if not c.debugnoreply:
             comment.reply(f'''Your ratings of {base.displayname} have been recieved.\n\n
-**Overall base rating:** {overallrating}/10 out of {str(bases.db.count_ratings(base.names[0], False))} ratings. 
+**Overall base rating:** {overallrating}/10 from {str(bases.db.count_ratings(base.names[0], False))} ratings. 
 | **Ranking:** {ranking} out of {rankingcount} bases.\n\n
 **General rating:** {str(base.getrating("rate"))} from {str(bases.db.count_ratings(base.names[0], "rate"))} ratings. 
 | **Local Area rating:** {str(base.getrating("arearate"))} from {str(bases.db.count_ratings(base.names[0], "arearate"))} ratings.\n\n
