@@ -5,10 +5,9 @@ def getsearch(session, base):
     """Main function, returns proper format of links and sneak peak of a comment."""
     sublist = getsubs(session, base)
     topcomments = gettopcomments(sublist)
-    url = "[Create your own discussion.](https://www.reddit.com/r/RateMyAFB/submit)"
     if not sublist:
         return f"""I could not find a discussion in /r/RateMyAFB for this base, perhaps you could
-[start one?](https://www.reddit.com/r/RateMyAFB/submit?selftext=true)\n\n{url}\n\n"""
+[start one?](https://www.reddit.com/r/RateMyAFB/submit?selftext=true)\n\n"""
     reply = getreply(sublist, topcomments)
     return reply
 
