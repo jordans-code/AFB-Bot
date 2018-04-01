@@ -18,7 +18,7 @@ class Base(object):
     def getrating(self, rtype):
         overallrating = db.query_rating(self.names[0], rtype)
         if overallrating < 1:
-            return "Un-rated"
+            return "Unrated"
         else:
             roundedrating = "%.2f" % overallrating
             return roundedrating
@@ -29,7 +29,7 @@ class Base(object):
             roundedrating = "%.2f" % truerating
             return roundedrating
         else:
-            return "Un-rated"
+            return "Unrated"
 
     def changerating(self, author, rtype, rating, commentid, threadid):
         db.change_entry(self.names[0], author, rtype, rating, commentid, threadid)
@@ -39,7 +39,7 @@ class Base(object):
         if ranking:
             return ranking, count
         else:
-            return "Un-ranked", count
+            return "Unranked", count
 
     def getoverallranking(self):
         ranking, count = db.query_overallranking(self, all_bases)
@@ -47,7 +47,7 @@ class Base(object):
             ranking = f"**#{ranking}**"
             return ranking, count
         else:
-            return "Un-ranked", count
+            return "Unranked", count
 
     def getmajcom(self):
         if self.majcom is not None:
@@ -224,7 +224,7 @@ thumrait = Base("Salalah, Dhofar, Oman.", "AFCENT", "RAFO Thumrait", ["thumrait"
 
 # Army
 presidio = Base("Monterey, California. United States.", None, "Presidio of Monterey", ["presidio", "monterey"])
-redcloud = Base("Uijeongbu, South Korea.", None, "Camp Red Cloud", ["cloud"])
+redcloud = Base("Seoul, South Korea.", None, "Camp Red Cloud", ["cloud"])
 yongsan = Base("Seoul, South Korea.", None, "Yongsan Garrison", ["yongsan"])
 zama = Base("Sagamihara, Japan.", None, "Camp Zama", ["zama"])
 
