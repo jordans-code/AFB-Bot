@@ -93,7 +93,7 @@ cavalier = Base("Mountain, North Dakota. United States.", "AFSPC", "Cavalier Air
 columbus = Base("Columbus, Mississippi. United States.", "AETC", "Columbus Air Force Base", ["columbus"])
 creech = Base("Indian Springs, Nevada. United States.", "ACC", "Creech Air Force Base", ["creech"])
 davismonthan = Base("Tucson, Arizona. United States.", "ACC",
-                    "Davis-Monthan Air Force Base", ["davis", "monthan", "davis-monthan"])
+                    "Davis-Monthan Air Force Base", ["davis", "monthan", "davis-monthan", "dm"])
 dover = Base("Dover, Delaware. United States.", "AMC", "Dover Air Force Base", ["dover"])
 dyess = Base("Abilene, Texas. United States.", "AFGSC", "Dyess Air Force Base", ["dyess"])
 edwards = Base("Edwards, California. United States.", "AFMC", "Edwards Air Force Base", ["edwards"])
