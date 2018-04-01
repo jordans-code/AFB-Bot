@@ -115,14 +115,15 @@ def getwiki(base):
         summary = wikipedia.summary(f"{base.displayname}")
     except Exception as e:
         print("Wiki too busy, sleeping. " + str(e))
-        time.sleep(10)
+        time.sleep(30)
     else:
         return summary
 
 
 def getratings(base):
     """Generates all ratings and places in format for wiki"""
-    url = f"""*Want to add a rating?* [Check out the bot usage page.](https://www.reddit.com/r/AFBbot/wiki/about)"""
+    url = f"""*Want to add a rating?* [You can do so here, or in any other submission.](https://www.reddit.com/r/AFBbot/comments/88r5xz)\n\n
+*Have a question?* [Check out the bot usage page.](https://www.reddit.com/r/AFBbot/wiki/about)"""
     overall = str(base.gettrueoverallrating())
     general = str(base.getrating("rate"))
     area = str(base.getrating("arearate"))
