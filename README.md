@@ -45,7 +45,7 @@
 
 **Notes:**
 
-- For base information the bot will only handle one base per comment, if multiple are mentioned it will take the first it sees in it's list.
+- For base information the bot will only handle one base per comment, if multiple bases are mentioned it will take the first it sees in it's list. This is to prevent the bot from giving huge wall of text replies. 
 
 - If a user has already rated a base it will change their previous rating, ratings are stored in a SQLite3 DB.
 
