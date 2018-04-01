@@ -47,7 +47,7 @@ class Base(object):
             ranking = f"**#{ranking}**"
             return ranking, count
         else:
-            return "Unranked", count
+            return "**Unranked**", count
 
     def getmajcom(self):
         if self.majcom is not None:
