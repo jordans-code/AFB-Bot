@@ -56,7 +56,7 @@ def getformat(sub, single):
     title = list(sub.title)
     if len(title) > maxlength:
         del title[maxlength:len(title)]
-        title.insert(len(title), "-")
+        title.insert(len(title), "[...]")
     joinedtitle = ''.join(title)
     full = f"[{joinedtitle}]({url})"
     return full
@@ -138,6 +138,7 @@ def quotetext(listtext):
     return listtext
 
 #  Wiki functions below ----------------
+
 
 def getwikisearch(session, base):
     """Main function for returning discussions and top comments in wiki format"""
