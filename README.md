@@ -26,6 +26,7 @@
 - **OffBaseRate** is for a rating of the off base housing.
 
 >I was at **langley** for 2 years and the housing is great! Overall I **rate** it an **8**, and I **arearate** it **9.5** **AFBbot**.
+
 - To summon the bot for overall statistics, either in a comment or a submission include the bot's name (**afbbot**) and "**stats**".
 
 >**AFBbot**, lets see those **stats**!
