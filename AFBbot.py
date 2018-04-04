@@ -23,7 +23,7 @@ def reddit_login():
     return login
 
 
-comments_checked = []  # This is a fail safe for if the log fails to refrain from rechecking posts.
+comments_checked = {}  # This is a fail safe for if the log fails to refrain from rechecking posts.
 comment_checking = [None, None, None, None, None, None, None]  # Global var for the comment being checked, for errors.
 
 
@@ -48,9 +48,9 @@ def checkbases(comment, session):
                     for base in bases.all_bases:
                         for name in base.names:
                             if name in checktext:
+                                reply(comment, base, session)
                                 bases.db.log('reply', base.names[0], name, None, comment.id,
                                              comment.submission.id, None)
-                                reply(comment, base, session)
                                 return True  # Prevents multiple triggers creating multiple comments.
 
 
@@ -367,27 +367,31 @@ def bot_main(login):
             for sub in c.reddit_subs:
                 if c.debugsearch:
                     print("Checking in sub " + str(sub))
-                for comment in session.subreddit(sub).comments(limit=20):  # Need to check for locked thread, throws except
-                    if comment.id not in comments_checked and comment.author != c.reddit_user\
+                for comment in session.subreddit(sub).comments(limit=30):  # Need to check for locked thread, throws except
+                    if (not comments_checked.get(comment.id) or comments_checked.get(comment.id) < 3) and comment.author != c.reddit_user\
                             and len(comment.body.lower()) > 0 and not bases.db.checkblacklisted(comment.author, False):
                         comments_checking[1] = comment.author
                         comments_checking[3] = comment.id
                         comments_checking[4] = comment.submission.id
-                        if c.debugsearch:
-                            print("Comment " + str(comment.id) + " is not in " + str(comments_checked))
-                        comments_checked.append(comment.id)
+                        if comments_checked.get(comment.id):
+                            comments_checked[comment.id] += 1
+                        else:
+                            comments_checked[comment.id] = 1
                         checkbases(comment, session)
                     else:
                         continue
                 if c.debugsearch:
                     print("Checking threads...")
                 for thread in session.subreddit(sub).new(limit=5):
-                    if thread.id not in comments_checked and len(thread.selftext.lower()) > 0 and not\
+                    if (not comments_checked.get(thread.id) or comments_checked.get(thread.id) < 3) and len(thread.selftext.lower()) > 0 and not\
                             bases.db.checkblacklisted(thread.author, False):
                         comments_checking[1] = thread.author
                         comments_checking[3] = thread.id
                         comments_checking[4] = thread.id
-                        comments_checked.append(thread.id)
+                        if comments_checked.get(thread.id):
+                            comments_checked[thread.id] += 1
+                        else:
+                            comments_checked[thread.id] = 1
                         checkbasesthread(thread, session)
 
         except prawcore.exceptions.ResponseException as e:
@@ -406,7 +410,7 @@ def bot_main(login):
         except Exception as e:
             print(f"Logging {comments_checking[0]} {comments_checking[1]} {comments_checking[2]} {comments_checking[3]} {comments_checking[4]} {e}")
             bases.db.log('Error', str(comments_checking[0]), str(comments_checking[1]), comments_checking[2],
-                         str(comments_checking[3]), str(comments_checking[4]), str(e))
+                         None, None, str(comments_checking[3]) + " " + str(comments_checking[4]) + " " + str(e))
         else:
             if c.debugsearch:
                 print("Completed loop successfully.")
@@ -423,26 +427,31 @@ def bot_main(login):
         for sub in c.reddit_subs:
             if c.debugsearch:
                 print("Checking in sub " + str(sub))
-            for comment in session.subreddit(sub).comments(limit=20):  # Need to check for locked thread, throws except
-                if comment.id not in comments_checked and comment.author != c.reddit_user \
+            for comment in session.subreddit(sub).comments(limit=30):  # Need to check for locked thread, throws except
+                if (not comments_checked.get(comment.id) or comments_checked.get(comment.id) < 3) and comment.author != c.reddit_user \
                         and len(comment.body.lower()) > 0:
                     comments_checking[1] = comment.author
                     comments_checking[3] = comment.id
                     comments_checking[4] = comment.submission.id
-                    if c.debugsearch:
-                        print("Comment " + str(comment.id) + " is not in " + str(comments_checked))
-                    comments_checked.append(comment.id)
+                    if comments_checked.get(comment.id):
+                        comments_checked[comment.id] += 1
+                    else:
+                        comments_checked[comment.id] = 1
+                    print(str(comment.body))
                     checkbases(comment, session)
                 else:
                     continue
             if c.debugsearch:
                 print("Checking threads...")
             for thread in session.subreddit(sub).new(limit=5):
-                if thread.id not in comments_checked and len(thread.selftext.lower()) > 0:
+                if (not comments_checked.get(thread.id) or comments_checked.get(thread.id) < 3) and len(thread.selftext.lower()) > 0:
                     comments_checking[1] = thread.author
                     comments_checking[3] = thread.id
                     comments_checking[4] = thread.id
-                    comments_checked.append(thread.id)
+                    if comments_checked.get(thread.id):
+                        comments_checked[thread.id] += 1
+                    else:
+                        comments_checked[thread.id] = 1
                     checkbasesthread(thread, session)
         if c.debugsearch:
             print("Sleeping...")
@@ -462,3 +471,8 @@ if __name__ == "__main__":
                 wiki.maintainer.update(session)
             except wikipedia.exceptions.WikipediaException as e:
                 print("Wiki error: " + str(e))
+            except prawcore.exceptions.ServerError as e:
+                print("Wiki Server error, Sleeping. " + str(e))
+                time.sleep(30)
+            except Exception as e:
+                print("Unhandled exception in wiki main: " + str(e))
