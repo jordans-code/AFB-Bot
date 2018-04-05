@@ -49,7 +49,7 @@ def checkbases(comment, session):
                         for name in base.names:
                             if name in checktext:
                                 reply(comment, base, session)
-                                bases.db.log('reply', base.names[0], name, None, comment.id,
+                                bases.db.log('reply', base.names[0], str(comment.author), None, comment.id,
                                              comment.submission.id, None)
                                 return True  # Prevents multiple triggers creating multiple comments.
 
@@ -109,7 +109,7 @@ def checkbasesthread(thread, session):
         for trigger in c.triggers:
             if trigger.lower() in checktext:
                 if "stats" in checktext:
-                    statsreply(thread.id, thread.id)
+                    statsreply(thread, thread.id)
                     return True
                 elif checkforrating(thread, checktext, stringtext, True):
                     return True  # Prevents multiple base triggers creating multiple comments.
@@ -117,7 +117,7 @@ def checkbasesthread(thread, session):
                     for base in bases.all_bases:
                         for name in base.names:
                             if name in checktext:
-                                bases.db.log('reply', base.names[0], name, None, thread.id, thread.id, None)
+                                bases.db.log('reply', base.names[0], str(thread.author), None, thread.id, thread.id, None)
                                 reply(thread, base, session)
                                 return True  # Prevents multiple triggers creating multiple comments.
 
@@ -289,7 +289,7 @@ def reply(comment, base, session):
     ranking, rankingcount = base.getoverallranking()
     if not c.debugnoreply:
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
-{stats.weather.getweather(base.location)}
+{stats.weather.getweather(base.location, base.manualweather)}
 {search.getsearch(session, base.names[0])}
 **Overall base rating:** {overallrating}/10 from {str(bases.db.count_ratings(base.names[0], False))} ratings. 
 | **Ranking:** {ranking} out of {rankingcount} bases.\n\n
@@ -437,7 +437,6 @@ def bot_main(login):
                         comments_checked[comment.id] += 1
                     else:
                         comments_checked[comment.id] = 1
-                    print(str(comment.body))
                     checkbases(comment, session)
                 else:
                     continue
@@ -466,6 +465,7 @@ if __name__ == "__main__":
     while True:  # Main loop
         session = reddit_login()
         bot_main(session)
+
         if c.updatewiki:
             try:
                 wiki.maintainer.update(session)
