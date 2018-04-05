@@ -2,11 +2,15 @@ import pywapi
 import database
 
 
-def getweather(location):
+def getweather(location, manualweather):
     try:
-        locationid = pywapi.get_location_ids(location)
-        for key in locationid:
-            locationid = key
+        if not manualweather:
+            locationid = pywapi.get_location_ids(location)
+
+            for key in locationid:
+                locationid = key
+        else:
+            locationid = manualweather
         weather = pywapi.get_weather_from_weather_com(str(locationid), units='imperial')
         condition = str(weather['current_conditions']['text']).lower()
         feels_like = str(weather['current_conditions']['feels_like'])
@@ -31,11 +35,15 @@ def getweather(location):
         return ""
 
 
-def getallweather(location):
+def getallweather(location, manualweather):
     try:
-        locationid = pywapi.get_location_ids(location)
-        for key in locationid:
-            locationid = key
+        if not manualweather:
+            locationid = pywapi.get_location_ids(location)
+
+            for key in locationid:
+                locationid = key
+        else:
+            locationid = manualweather
         weather = pywapi.get_weather_from_weather_com(str(locationid), units='imperial')
         final = weather['current_conditions']['temperature']
         if final == '':
@@ -45,5 +53,6 @@ def getallweather(location):
 
     except Exception as e:
         print(location + " Error trying to get all weather location for stats.")
-        database.log(f"weather", str({location}), None, None, None, None, "Weather error, most likely invalid location.")
+        print(str(e))
+        database.log(f"weather", str({location}), None, None, None, None, "Weather error, most likely invalid location. " + str(e))
         return 50  # For handling exceptions if the site returns null

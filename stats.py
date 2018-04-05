@@ -21,8 +21,8 @@ class Stats:
         reply = f"""Here are the overall stats,\n\n
 Highest rated base overall: {highest.displayname}. {highestvalue}/10 from {bases.db.count_ratings(highest.names[0], False)} ratings.\n\n
 Lowest rated base overall: {lowest.displayname}. {lowestvalue}/10 from {bases.db.count_ratings(lowest.names[0], False)} ratings.\n\n
-Current highest base temperature: {self.warmest.displayname}. {weather.getweather(self.warmest.location)}
-Current lowest base temperature: {self.coldest.displayname}. {weather.getweather(self.coldest.location)}"""
+Current highest base temperature: {self.warmest.displayname}. {weather.getweather(self.warmest.location, self.warmest.manualweather)}
+Current lowest base temperature: {self.coldest.displayname}. {weather.getweather(self.coldest.location, self.coldest.manualweather)}"""
         return reply
 
     def temp(self):
@@ -41,7 +41,7 @@ Current lowest base temperature: {self.coldest.displayname}. {weather.getweather
         for base in bases.all_bases:
             if constants.debugweather:
                 print("Getting weather for " + base.names[0])
-            self.allweather[base.names[0]] = int(weather.getallweather(base.location))
+            self.allweather[base.names[0]] = int(weather.getallweather(base.location, base.manualweather))
             time.sleep(1)
 
     def reporttemps(self):
