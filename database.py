@@ -8,13 +8,18 @@ c = db.cursor()
 
 
 def log(typeof, base, name, rating, commentid, threadid, message):
-    """Logs an error or message"""
-    unix = time.time()
-    now = datetime.datetime.now()
-    datestamp = f"{now.year}-{now.month}-{now.day}"
-    c.execute('INSERT INTO log VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', (unix, datestamp, typeof, base,
-                                                           name, rating, commentid, threadid, message),)
-    db.commit()
+    try:
+        """Logs an error or message"""
+        unix = time.time()
+        now = datetime.datetime.now()
+        datestamp = f"{now.year}-{now.month}-{now.day}"
+        c.execute('INSERT INTO log VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', (unix, datestamp, typeof, base,
+                                                               name, rating, commentid, threadid, message),)
+        db.commit()
+    except Exception as e:
+        print(f"DATABASE ERROR, SHUTTING DOWN. {typeof} {base} {name} {rating} {commentid} {threadid} {message}")
+        print(str(e))
+        exit(1)
 
 
 def create_table(base):
