@@ -164,7 +164,7 @@ langley = Base("Hampton, Virginia. United States.", None, "ACC", "JB Langley-Eus
 mcchord = Base("Tacoma, Washington. United States.", None, "AMC",
                "JB Lewis-McChord", ["mcchord", "lewis-mcchord"])
 mcguire = Base("Trenton, New Jersey. United States.", None, None,
-                "JB McGuire-Dix-Lakehurst", ["mcguire", "mcguire-dix-lakehurst"])
+                "JB McGuire-Dix-Lakehurst", ["mcguire", "mcguire-dix-lakehurst", "dix-mcguire", "guire"])
 hickam = Base("Honolulu, Hawaii. United States.", None, "PACAF", "JB Pearl Harbor-Hickam", ["hickam"])
 lackland = Base("San Antonio, Texas. United States.", None, "AETC", "JB San Antonio", ["lackland", "jbsa", "randolph"])
 andersen = Base("Yigo, Guam.", None, None, "Joint Region Marianas", ["andersen", "marianas"])
