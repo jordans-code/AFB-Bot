@@ -3,7 +3,7 @@ import database as db
 
 def getsearch(session, base):
     """Main function, returns proper format of links and sneak peak of a comment."""
-    sublist = getsubs(session, base)
+    sublist = getsubs(session, base.names)
     topcomments = gettopcomments(sublist)
     if not sublist:
         return f"""I could not find a discussion in /r/RateMyAFB for this base, perhaps you could
@@ -13,11 +13,12 @@ def getsearch(session, base):
 
 
 def getsubs(session, base):
-    """Gets a list of discussions in ratemyafb"""
+    """Makes a list of submissions found in ratemyafb from querying the base keyword list"""
     allsubmissions = []
-    for submission in session.subreddit('ratemyafb').search(f"{base}"):
-        if not db.checkblacklisted(submission.author, submission.id):
-            allsubmissions.append(submission)
+    for i in range(len(base)):
+        for submission in session.subreddit('ratemyafb').search(f"{base[i]}"):
+            if not db.checkblacklisted(submission.author, submission.id) and submission not in allsubmissions:
+                allsubmissions.append(submission)
     return allsubmissions
 
 
@@ -142,7 +143,7 @@ def quotetext(listtext):
 def getwikisearch(session, base):
     """Main function for returning discussions and top comments in wiki format"""
     url = "[Create your own discussion.](https://www.reddit.com/r/RateMyAFB/submit)"
-    sublist = getsubs(session, base)
+    sublist = getsubs(session, base.names)
     if not sublist:
         return f"""##Discussions\nThere are no discussions in /r/RateMyAFB for this base, perhaps you could
 start one?\n\n{url}\n\n"""

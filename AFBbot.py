@@ -290,7 +290,7 @@ def reply(comment, base, session):
     if not c.debugnoreply:
         comment.reply(f"""{base.displayname}{base.getmajcom()} is located in {base.location}\n\n
 {stats.weather.getweather(base.location, base.manualweather)}
-{search.getsearch(session, base.names[0])}
+{search.getsearch(session, base)}
 **Overall base rating:** {overallrating}/10 from {str(bases.db.count_ratings(base.names[0], False))} ratings. 
 | **Ranking:** {ranking} out of {rankingcount} bases.\n\n
 \n\n{wikiurl}""" + c.bot_signature)

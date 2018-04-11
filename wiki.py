@@ -101,7 +101,7 @@ def genpage(session, base):
         print("Generating wiki page for " + (str(base.displayname)))
     wikisummary = getwiki(base)
     ratings = getratings(base)
-    discussions = search.getwikisearch(session, base.names[0])
+    discussions = search.getwikisearch(session, base)
     final = f"""#{base.displayname}\n{wikisummary}\n\n---\n\n
 {ratings}{discussions}"""
     if c.debugwiki:
